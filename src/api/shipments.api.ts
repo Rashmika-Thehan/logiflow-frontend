@@ -9,5 +9,6 @@ export interface PublicTracking {
 }
 
 export const shipmentsApi = {
-  track: (code: string) => api.get<PublicTracking>(`/shipments/track/${encodeURIComponent(code)}`).then((res) => res.data),
+  track: (code: string) =>
+    api.get<PublicTracking>(`/shipments/track/${encodeURIComponent(code)}`).then((res) => res.data),
 };

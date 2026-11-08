@@ -14,3 +14,4 @@ The backend gateway must allow CORS with credentials for `http://localhost:5173`
 - `src/api/client.ts` holds the Axios instance, the shared single flight 401 refresh and the session expired hook.
 - `src/stores/authStore.ts` holds session state (`bootstrap`, `login`, `logout`).
 - `src/content/landing.ts` holds all landing copy. Values marked SPEC or wrapped in `{{ }}` need real data.
+  x

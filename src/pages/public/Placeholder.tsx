@@ -9,7 +9,9 @@ export default function Placeholder({ title, note }: { title: string; note: stri
         <h1 className="heading-3">{title}</h1>
         {trackingCode && <p className="body-2">Tracking code {trackingCode}</p>}
         <p className="body-3 text-fg-muted">{note}</p>
-        <Button asChild variant="secondary"><Link to="/">Back to home</Link></Button>
+        <Button asChild variant="secondary">
+          <Link to="/">Back to home</Link>
+        </Button>
       </div>
     </section>
   );

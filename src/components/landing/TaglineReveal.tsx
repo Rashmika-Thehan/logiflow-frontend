@@ -13,9 +13,13 @@ export function TaglineReveal() {
       return;
     }
     const io = new IntersectionObserver(
-      (entries) => entries.forEach((e) => {
-        if (e.isIntersecting) { (e.target as HTMLElement).dataset.on = 'true'; io.unobserve(e.target); }
-      }),
+      (entries) =>
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            (e.target as HTMLElement).dataset.on = 'true';
+            io.unobserve(e.target);
+          }
+        }),
       { rootMargin: '0px 0px -40% 0px' },
     );
     spans.forEach((s) => io.observe(s));
@@ -26,7 +30,13 @@ export function TaglineReveal() {
     <section className="px-4 py-24" aria-label="Our promise">
       <p ref={root} className="heading-2 mx-auto max-w-[680px]">
         {words.map((w, i) => (
-          <span key={i} data-word className="text-fg/30 transition-colors duration-500 ease-brand data-[on=true]:text-fg">{w}{' '}</span>
+          <span
+            key={i}
+            data-word
+            className="text-fg/30 transition-colors duration-500 ease-brand data-[on=true]:text-fg"
+          >
+            {w}{' '}
+          </span>
         ))}
       </p>
     </section>

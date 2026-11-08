@@ -39,8 +39,14 @@ export const benefits = [
 
 export const steps = [
   { title: 'Add shipments', body: 'Create one parcel, or import up to 5,000 rows from a CSV or Excel file.' },
-  { title: 'Let the engine offer the job', body: 'The best scored driver gets an offer with a countdown. If they pass, the next candidate is tried.' },
-  { title: 'Follow it to the door', body: 'Watch the driver on the live map. Recipients follow the same trip from a public tracking page.' },
+  {
+    title: 'Let the engine offer the job',
+    body: 'The best scored driver gets an offer with a countdown. If they pass, the next candidate is tried.',
+  },
+  {
+    title: 'Follow it to the door',
+    body: 'Watch the driver on the live map. Recipients follow the same trip from a public tracking page.',
+  },
 ];
 
 export const tagline = [

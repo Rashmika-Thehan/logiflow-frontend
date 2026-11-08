@@ -1,61 +1,140 @@
-@import "tailwindcss";
-@import "@fontsource-variable/geist";
+@import 'tailwindcss';
+@import '@fontsource-variable/geist';
 
 @theme {
-  --font-sans: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Geist Variable', ui-sans-serif, system-ui, sans-serif;
 
   /* Dark surfaces (SKILL B4 allowed list only) */
   --color-surface-0: #000000;
   --color-surface-1: #131209;
   --color-surface-2: #181818;
-  --color-surface-3: #1F1F1F;
+  --color-surface-3: #1f1f1f;
   --color-surface-4: #272727;
   --color-surface-5: #313131;
 
-  --color-fg: #FFFFFF;
-  --color-fg-muted: #9B9B9B;
+  --color-fg: #ffffff;
+  --color-fg-muted: #9b9b9b;
 
   /* Fleet status colours */
-  --color-status-available: #34D399;
-  --color-status-busy: #60A5FA;
-  --color-status-break: #FBBF24;
-  --color-status-urgent: #F87171;
+  --color-status-available: #34d399;
+  --color-status-busy: #60a5fa;
+  --color-status-break: #fbbf24;
+  --color-status-urgent: #f87171;
 
   --ease-brand: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @layer base {
-  html { color-scheme: dark; scroll-behavior: smooth; }
-  body { @apply bg-surface-0 text-fg font-sans antialiased; }
-  em, i { font-style: normal; }
-  :focus-visible { outline: 2px solid #FFFFFF; outline-offset: 2px; }
-  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  html {
+    color-scheme: dark;
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-surface-0 text-fg font-sans antialiased;
+  }
+  em,
+  i {
+    font-style: normal;
+  }
+  :focus-visible {
+    outline: 2px solid #ffffff;
+    outline-offset: 2px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
 }
 
 /* Named text styles (SKILL B1). Every size resolves to a Tailwind scale step. */
-@utility heading-1 { @apply text-4xl md:text-6xl font-semibold; text-wrap: balance; }
-@utility heading-2 { @apply text-3xl md:text-5xl font-semibold; text-wrap: balance; }
-@utility heading-3 { @apply text-2xl md:text-4xl font-semibold; text-wrap: balance; }
-@utility heading-4 { @apply text-3xl font-semibold; text-wrap: balance; }
-@utility heading-5 { @apply text-2xl font-semibold; text-wrap: balance; }
-@utility heading-6 { @apply text-xl font-semibold; text-wrap: balance; }
-@utility title-1 { @apply text-xl font-medium; }
-@utility title-2 { @apply text-lg font-medium; }
-@utility title-3 { @apply text-base font-medium; }
-@utility title-4 { @apply text-sm font-medium; }
-@utility title-5 { @apply text-xs font-medium; }
-@utility body-1 { @apply text-base font-semibold; text-wrap: pretty; }
-@utility body-2 { @apply text-base font-medium; text-wrap: pretty; }
-@utility body-3 { @apply text-base font-normal; text-wrap: pretty; }
-@utility body-4 { @apply text-sm font-semibold; text-wrap: pretty; }
-@utility body-5 { @apply text-sm font-medium; text-wrap: pretty; }
-@utility body-6 { @apply text-sm font-normal; text-wrap: pretty; }
-@utility button-lg { @apply text-lg font-semibold; }
-@utility button-md { @apply text-base font-semibold; }
-@utility button-sm { @apply text-sm font-semibold; }
-@utility button-xsm { @apply text-xs font-semibold; }
-@utility caption-1 { @apply text-sm font-medium; }
-@utility caption-2 { @apply text-sm font-normal; }
-@utility caption-3 { @apply text-xs font-semibold; }
-@utility caption-4 { @apply text-xs font-medium; }
-@utility caption-5 { @apply text-xs font-normal; }
+@utility heading-1 {
+  @apply text-4xl md:text-6xl font-semibold;
+  text-wrap: balance;
+}
+@utility heading-2 {
+  @apply text-3xl md:text-5xl font-semibold;
+  text-wrap: balance;
+}
+@utility heading-3 {
+  @apply text-2xl md:text-4xl font-semibold;
+  text-wrap: balance;
+}
+@utility heading-4 {
+  @apply text-3xl font-semibold;
+  text-wrap: balance;
+}
+@utility heading-5 {
+  @apply text-2xl font-semibold;
+  text-wrap: balance;
+}
+@utility heading-6 {
+  @apply text-xl font-semibold;
+  text-wrap: balance;
+}
+@utility title-1 {
+  @apply text-xl font-medium;
+}
+@utility title-2 {
+  @apply text-lg font-medium;
+}
+@utility title-3 {
+  @apply text-base font-medium;
+}
+@utility title-4 {
+  @apply text-sm font-medium;
+}
+@utility title-5 {
+  @apply text-xs font-medium;
+}
+@utility body-1 {
+  @apply text-base font-semibold;
+  text-wrap: pretty;
+}
+@utility body-2 {
+  @apply text-base font-medium;
+  text-wrap: pretty;
+}
+@utility body-3 {
+  @apply text-base font-normal;
+  text-wrap: pretty;
+}
+@utility body-4 {
+  @apply text-sm font-semibold;
+  text-wrap: pretty;
+}
+@utility body-5 {
+  @apply text-sm font-medium;
+  text-wrap: pretty;
+}
+@utility body-6 {
+  @apply text-sm font-normal;
+  text-wrap: pretty;
+}
+@utility button-lg {
+  @apply text-lg font-semibold;
+}
+@utility button-md {
+  @apply text-base font-semibold;
+}
+@utility button-sm {
+  @apply text-sm font-semibold;
+}
+@utility button-xsm {
+  @apply text-xs font-semibold;
+}
+@utility caption-1 {
+  @apply text-sm font-medium;
+}
+@utility caption-2 {
+  @apply text-sm font-normal;
+}
+@utility caption-3 {
+  @apply text-xs font-semibold;
+}
+@utility caption-4 {
+  @apply text-xs font-medium;
+}
+@utility caption-5 {
+  @apply text-xs font-normal;
+}

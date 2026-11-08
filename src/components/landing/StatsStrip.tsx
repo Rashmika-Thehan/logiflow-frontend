@@ -13,7 +13,9 @@ export function StatsStrip() {
         ))}
         <figure className="flex flex-col gap-2 rounded-2xl border border-surface-5 bg-surface-2 p-6">
           <blockquote className="body-6">{testimonial.quote}</blockquote>
-          <figcaption className="caption-2 text-fg-muted">{testimonial.name}, {testimonial.role}</figcaption>
+          <figcaption className="caption-2 text-fg-muted">
+            {testimonial.name}, {testimonial.role}
+          </figcaption>
         </figure>
       </Reveal>
     </section>

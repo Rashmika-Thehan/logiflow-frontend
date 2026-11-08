@@ -5,7 +5,9 @@ export function HowItWorks() {
   return (
     <section id="how-it-works" className="scroll-mt-24 px-4 pb-24">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-12">
-        <Reveal><h2 className="heading-2 max-w-[680px]">From new shipment to signed delivery in three steps</h2></Reveal>
+        <Reveal>
+          <h2 className="heading-2 max-w-[680px]">From new shipment to signed delivery in three steps</h2>
+        </Reveal>
         <ol className="grid gap-4 md:grid-cols-3">
           {steps.map((s, i) => (
             <li key={s.title}>

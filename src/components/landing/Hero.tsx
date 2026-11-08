@@ -39,25 +39,50 @@ export function Hero() {
             className="hero-elem heading-1 max-w-[680px] bg-clip-text text-transparent"
             style={{ backgroundImage: 'linear-gradient(to right, #FFFFFF, #9B9B9B)' }}
           >
-            Match every parcel<br className="hidden md:inline" /> to the right driver<br className="hidden md:inline" /> in seconds
+            Match every parcel
+            <br className="hidden md:inline" /> to the right driver
+            <br className="hidden md:inline" /> in seconds
           </h1>
           <p className="hero-elem body-3 max-w-[680px] text-fg-muted">
-            LogiFlow scores every available driver on distance, vehicle capacity and shift status, offers the job, and follows the parcel until the recipient confirms with a four digit code.
+            LogiFlow scores every available driver on distance, vehicle capacity and shift status, offers the job, and
+            follows the parcel until the recipient confirms with a four digit code.
           </p>
           <div className="hero-elem flex flex-wrap items-center gap-3">
-            <Button asChild size="lg"><Link to="/register">Start free trial</Link></Button>
+            <Button asChild size="lg">
+              <Link to="/register">Start free trial</Link>
+            </Button>
             <p className="caption-2 text-fg-muted">14 day trial for logistics teams</p>
           </div>
           <form onSubmit={onTrack} noValidate className="hero-elem flex max-w-md flex-col gap-2">
-            <label htmlFor="hero-track" className="caption-1 text-fg-muted">Have a tracking code?</label>
+            <label htmlFor="hero-track" className="caption-1 text-fg-muted">
+              Have a tracking code?
+            </label>
             <div className="flex gap-2">
-              <Input id="hero-track" value={code} onChange={(e) => { setCode(e.target.value); setError(''); }} placeholder="Enter your tracking code" aria-invalid={!!error} aria-describedby={error ? 'hero-track-error' : undefined} />
-              <Button type="submit" variant="secondary" size="sm">Track</Button>
+              <Input
+                id="hero-track"
+                value={code}
+                onChange={(e) => {
+                  setCode(e.target.value);
+                  setError('');
+                }}
+                placeholder="Enter your tracking code"
+                aria-invalid={!!error}
+                aria-describedby={error ? 'hero-track-error' : undefined}
+              />
+              <Button type="submit" variant="secondary" size="sm">
+                Track
+              </Button>
             </div>
-            {error && <p id="hero-track-error" role="alert" className="caption-2 text-status-urgent">{error}</p>}
+            {error && (
+              <p id="hero-track-error" role="alert" className="caption-2 text-status-urgent">
+                {error}
+              </p>
+            )}
           </form>
         </div>
-        <div className="hero-elem"><DispatchPreview /></div>
+        <div className="hero-elem">
+          <DispatchPreview />
+        </div>
       </div>
     </section>
   );
