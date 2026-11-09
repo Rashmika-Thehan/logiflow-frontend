@@ -1,7 +1,7 @@
 import { create } from 'zustand';
-import { authApi, type LoginInput } from '@/api/auth.api';
 import { setSessionExpiredHandler } from '@/api/client';
 import type { UserContext, UserRole } from '@/types';
+import { authApi, type LoginInput, type RegisterInput } from '@/api/auth.api';
 
 type Status = 'idle' | 'loading' | 'authenticated' | 'anonymous';
 
@@ -9,6 +9,7 @@ interface AuthState {
   user: UserContext | null;
   status: Status;
   bootstrap: () => Promise<void>;
+  register: (input: RegisterInput) => Promise<UserContext>;
   login: (input: LoginInput) => Promise<UserContext>;
   logout: () => Promise<void>;
   clear: () => void;
@@ -27,6 +28,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     } catch {
       set({ user: null, status: 'anonymous' });
     }
+  },
+
+  register: async (input) => {
+    await authApi.register(input);
+    const user = await authApi.me();
+    set({ user, status: 'authenticated' });
+    return user;
   },
 
   login: async (input) => {
