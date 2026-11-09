@@ -16,3 +16,7 @@ export default function Placeholder({ title, note }: { title: string; note: stri
     </section>
   );
 }
+
+export function Soon({ title }: { title: string }) {
+  return <Placeholder title={title} note="This screen is the next build step." />;
+}
