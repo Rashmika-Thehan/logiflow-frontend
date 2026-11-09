@@ -11,18 +11,9 @@ import { Logo } from '@/components/common/Logo';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { EASE_BRAND } from '@/lib/utils';
+import { Field } from '@/components/ui/field';
 
 const steps = ['Depot', 'Dispatch rules', 'Join code'];
-
-function Field({ id, label, error, children }: { id: string; label: string; error?: string; children: React.ReactNode }) {
-    return (
-        <div className="flex flex-col gap-1">
-            <label htmlFor={id} className="caption-1">{label}</label>
-            {children}
-            {error && <p role="alert" className="caption-2 text-status-urgent">{error}</p>}
-        </div>
-    );
-}
 
 /* Step 1 */
 const branchSchema = z.object({
