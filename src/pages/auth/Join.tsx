@@ -147,6 +147,7 @@ function VerifyStep({ id, onVerified }: { id: string; onVerified: () => void }) 
     const [code, setCode] = useState('');
     const [error, setError] = useState('');
     const [busy, setBusy] = useState(false);
+    const [resending, setResending] = useState(false);
     const [cooldown, setCooldown] = useState(30);
     const [resent, setResent] = useState(false);
 
@@ -175,6 +176,8 @@ function VerifyStep({ id, onVerified }: { id: string; onVerified: () => void }) 
     };
 
     const resend = async () => {
+        if (resending || cooldown > 0) return;
+        setResending(true);
         setError('');
         try {
             await joinApi.resendCode(id);
@@ -182,6 +185,8 @@ function VerifyStep({ id, onVerified }: { id: string; onVerified: () => void }) 
             setCooldown(30);
         } catch (err) {
             setError(getErrorMessage(err, 'We could not send a new code. Try again in a moment.'));
+        } finally {
+            setResending(false);
         }
     };
 
@@ -206,8 +211,8 @@ function VerifyStep({ id, onVerified }: { id: string; onVerified: () => void }) 
                 <Button type="submit" disabled={busy}>
                     {busy ? 'Verifying' : 'Verify email'}
                 </Button>
-                <Button type="button" variant="ghost" disabled={cooldown > 0} onClick={resend}>
-                    {cooldown > 0 ? `Resend in ${cooldown}s` : 'Resend code'}
+                <Button type="button" variant="ghost" disabled={resending || cooldown > 0} onClick={resend}>
+                    {resending ? 'Resending code' : cooldown > 0 ? `Resend in ${cooldown}s` : 'Resend code'}
                 </Button>
             </div>
         </form>
