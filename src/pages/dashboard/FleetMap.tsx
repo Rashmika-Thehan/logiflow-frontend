@@ -4,7 +4,7 @@ import { LiveFleetMap } from '@/components/map/LiveFleetMap';
 export default function FleetMap() {
     const [selected, setSelected] = useState<string | null>(null);
     return (
-        <div className="h-screen">
+        <div className="h-full">
             <LiveFleetMap selectedId={selected} onSelect={setSelected} />
         </div>
     );
