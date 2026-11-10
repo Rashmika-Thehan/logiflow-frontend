@@ -4,7 +4,8 @@ import { AuthLayout } from '@/layouts/AuthLayout';
 import Login from '@/pages/auth/Login';
 import Register from '@/pages/auth/Register';
 import Onboarding from '@/pages/onboarding/Onboarding';
-import { Soon } from '@/pages/public/Placeholder';
+import AcceptInvite from '@/pages/auth/AcceptInvite';
+import Join from '@/pages/auth/Join';
 
 // Owned by Track A (public and auth).
 export const authRoutes: RouteObject[] = [
@@ -13,7 +14,8 @@ export const authRoutes: RouteObject[] = [
         children: [
             { path: 'login', element: <Login /> },
             { path: 'register', element: <Register /> },
-            { path: 'join', element: <Soon title="Join an organization" /> },
+            { path: 'join', element: <Join /> },
+            { path: 'invite/accept', element: <AcceptInvite /> },
         ],
     },
     {
