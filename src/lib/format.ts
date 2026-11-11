@@ -10,3 +10,9 @@ export function timeAgo(iso: string, now = Date.now()): string {
 
 export const formatDateTime = (iso?: string) =>
     iso ? new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(iso)) : 'Not set';
+
+export const formatDate = (value?: string) => {
+    if (!value) return 'Not set';
+    const d = /^\d{4}-\d{2}-\d{2}$/.test(value) ? new Date(`${value}T00:00:00`) : new Date(value);
+    return new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' }).format(d);
+};
