@@ -1,5 +1,4 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Plus } from '@phosphor-icons/react';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { getErrorMessage } from '@/api/client';
@@ -12,6 +11,8 @@ import { Modal } from '@/components/ui/modal';
 import { formatDateTime } from '@/lib/format';
 import { statusLabel } from '@/lib/shipment';
 import type { Shipment, ShipmentStatus } from '@/types';
+import { PlusIcon, UploadSimpleIcon } from '@phosphor-icons/react';
+import { BatchImportDialog } from '@/components/dashboard/BatchImportDialog';
 
 const PAGE_SIZE = 20;
 const STATUSES: ShipmentStatus[] = ['PENDING', 'DISPATCHING', 'ASSIGNED', 'PICKED_UP', 'IN_TRANSIT', 'DELIVERED', 'CANCELLED', 'FAILED'];
@@ -26,6 +27,7 @@ export default function Shipments() {
 
     const queryClient = useQueryClient();
     const [createOpen, setCreateOpen] = useState(false);
+    const [importOpen, setImportOpen] = useState(false);
     const [toCancel, setToCancel] = useState<Shipment | null>(null);
     const [notice, setNotice] = useState<Notice | null>(null);
 
@@ -84,10 +86,16 @@ export default function Shipments() {
         <PageShell
             title="Shipments"
             actions={
-                <Button onClick={() => setCreateOpen(true)}>
-                    <Plus size={16} aria-hidden="true" />
-                    Create shipment
-                </Button>
+                <div className="flex gap-2">
+                    <Button variant="secondary" onClick={() => setImportOpen(true)}>
+                        <UploadSimpleIcon size={16} aria-hidden="true" />
+                        Batch import
+                    </Button>
+                    <Button onClick={() => setCreateOpen(true)}>
+                        <PlusIcon size={16} aria-hidden="true" />
+                        Create shipment
+                    </Button>
+                </div>
             }
         >
             {notice && (
@@ -209,6 +217,8 @@ export default function Shipments() {
                     </div>
                 </div>
             )}
+
+            <BatchImportDialog open={importOpen} onClose={() => setImportOpen(false)} />
 
             <CreateShipmentDialog
                 open={createOpen}
