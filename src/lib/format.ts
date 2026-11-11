@@ -7,3 +7,6 @@ export function timeAgo(iso: string, now = Date.now()): string {
     if (hours < 24) return `${hours} h ago`;
     return `${Math.round(hours / 24)} d ago`;
 }
+
+export const formatDateTime = (iso?: string) =>
+    iso ? new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(iso)) : 'Not set';

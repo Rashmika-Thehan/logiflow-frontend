@@ -1,18 +1,40 @@
 import { api } from './client';
-import type { DriverTelemetry } from '@/types';
+import type { Paginated, PriorityTier, Shipment, ShipmentStatus } from '@/types';
 
-// Response shapes are not documented in the spec. We assume arrays of DriverTelemetry.
-export interface NearbyParams { lat: number; lng: number; radiusKm?: number; limit?: number }
-export interface BoxParams { minLat: number; maxLat: number; minLng: number; maxLng: number; limit?: number }
-export interface ReplayPoint { lat: number; lng: number; ts: number }
+export interface PublicTracking {
+    trackingCode: string;
+    status: string;
+    priority: string;
+    deliveryWindowStart?: string;
+    deliveryWindowEnd?: string;
+}
 
-export const trackingApi = {
-    nearby: (params: NearbyParams) =>
-        api.get<DriverTelemetry[]>('/tracking/drivers/nearby', { params }).then((r) => r.data),
-    inBox: (params: BoxParams) =>
-        api.get<DriverTelemetry[]>('/tracking/drivers/in-box', { params }).then((r) => r.data),
-    position: (driverId: string) =>
-        api.get<DriverTelemetry>(`/tracking/drivers/${driverId}/position`).then((r) => r.data),
-    replay: (shipmentId: string, limit = 500) =>
-        api.get<ReplayPoint[]>(`/tracking/trips/${shipmentId}/replay`, { params: { limit } }).then((r) => r.data),
+export interface ListShipmentsParams {
+    page: number;
+    limit: number;
+    status?: ShipmentStatus;
+}
+
+export interface CreateShipmentInput {
+    recipientName: string;
+    recipientPhone: string;
+    recipientEmail?: string;
+    recipientAddress: string;
+    recipientLat: number;
+    recipientLng: number;
+    weightKg: number;
+    lengthCm: number;
+    widthCm: number;
+    heightCm: number;
+    priority: PriorityTier;
+    deliveryWindowStart?: string;
+    deliveryWindowEnd?: string;
+}
+
+export const shipmentsApi = {
+    track: (code: string) => api.get<PublicTracking>(`/shipments/track/${encodeURIComponent(code)}`).then((res) => res.data),
+    list: (params: ListShipmentsParams) => api.get<Paginated<Shipment>>('/shipments', { params }).then((r) => r.data),
+    create: (input: CreateShipmentInput) => api.post<Shipment>('/shipments', input).then((r) => r.data),
+    cancel: (id: string) => api.post(`/shipments/${id}/cancel`),
+    reissueOtp: (id: string) => api.post(`/shipments/${id}/reissue-otp`),
 };
