@@ -220,15 +220,17 @@ export default function Shipments() {
 
             <BatchImportDialog open={importOpen} onClose={() => setImportOpen(false)} />
 
-            <CreateShipmentDialog
-                open={createOpen}
-                onClose={() => setCreateOpen(false)}
-                onCreated={(code) => {
-                    setCreateOpen(false);
-                    setNotice({ tone: 'ok', text: `Shipment ${code} was created and sent to dispatch.` });
-                    void refresh();
-                }}
-            />
+            {createOpen && (
+                <CreateShipmentDialog
+                    open
+                    onClose={() => setCreateOpen(false)}
+                    onCreated={(code) => {
+                        setCreateOpen(false);
+                        setNotice({ tone: 'ok', text: `Shipment ${code} was created and sent to dispatch.` });
+                        void refresh();
+                    }}
+                />
+            )}
 
             <Modal open={!!toCancel} onClose={() => setToCancel(null)} title="Cancel this shipment?">
                 <p className="body-6 text-fg-muted">

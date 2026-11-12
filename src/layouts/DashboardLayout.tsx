@@ -2,7 +2,7 @@ import { List, SignOut } from '@phosphor-icons/react';
 import { useEffect, useState } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { AlertBell } from '@/components/dashboard/AlertBell';
-import { Sidebar } from '@/components/dashboard/SideBar';
+import { Sidebar } from '@/components/dashboard/Sidebar';
 import { Button } from '@/components/ui/button';
 import { useAlertsSSE } from '@/hooks/useAlertsSSE';
 import { useAuthStore } from '@/stores/authStore';
