@@ -2,11 +2,53 @@ import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios';
 
 export const API_ORIGIN: string = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
 
-/** Cookie based JWT: the browser sends httpOnly accessToken / refreshToken on every call. */
+export const getAccessToken = () => {
+  try {
+    return localStorage.getItem('accessToken');
+  } catch {
+    return null;
+  }
+};
+
+export const getRefreshToken = () => {
+  try {
+    return localStorage.getItem('refreshToken');
+  } catch {
+    return null;
+  }
+};
+
+export const setTokens = (accessToken?: string, refreshToken?: string) => {
+  try {
+    if (accessToken) localStorage.setItem('accessToken', accessToken);
+    if (refreshToken) localStorage.setItem('refreshToken', refreshToken);
+  } catch {
+    /* localStorage unavailable */
+  }
+};
+
+export const clearTokens = () => {
+  try {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+  } catch {
+    /* localStorage unavailable */
+  }
+};
+
+/** Dual auth: attaches Bearer JWT header if stored, and sends httpOnly cookies withCredentials. */
 export const api = axios.create({
   baseURL: `${API_ORIGIN}/api/v1`,
   withCredentials: true,
   headers: { 'Content-Type': 'application/json' },
+});
+
+api.interceptors.request.use((config) => {
+  const token = getAccessToken();
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
 
 type RetriableConfig = InternalAxiosRequestConfig & { _retry?: boolean };
@@ -27,9 +69,16 @@ export const setSessionExpiredHandler = (handler: () => void) => {
  * Bare axios is used so this call skips the interceptor below.
  */
 const refreshSession = (): Promise<void> => {
+  const refreshToken = getRefreshToken();
   refreshInFlight ??= axios
-    .post(`${API_ORIGIN}/api/v1/auth/refresh`, {}, { withCredentials: true })
-    .then(() => undefined)
+    .post(
+      `${API_ORIGIN}/api/v1/auth/refresh`,
+      { refreshToken: refreshToken || undefined },
+      { withCredentials: true }
+    )
+    .then((res) => {
+      setTokens(res.data?.accessToken, res.data?.refreshToken);
+    })
     .finally(() => {
       refreshInFlight = null;
     });
@@ -51,6 +100,7 @@ api.interceptors.response.use(
       await refreshSession();
       return api(original);
     } catch (refreshError) {
+      clearTokens();
       onSessionExpired?.();
       return Promise.reject(refreshError);
     }
