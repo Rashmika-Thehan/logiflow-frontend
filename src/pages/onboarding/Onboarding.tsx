@@ -166,7 +166,8 @@ function JoinCodeStep({ onFinish }: { onFinish: () => void }) {
         setError('');
         try {
             const existing = rotate ? null : await joinCodeApi.get().catch(() => null);
-            setCode(existing ?? (await joinCodeApi.generate()));
+            const existingCode = existing ? existing.joinCode ?? null : null;
+            setCode(existingCode ?? (await joinCodeApi.generate()).joinCode ?? null);
         } catch (err) {
             setError(getErrorMessage(err, 'We could not load the join code. Try again.'));
         } finally {

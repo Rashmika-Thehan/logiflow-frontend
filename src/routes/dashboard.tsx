@@ -6,6 +6,7 @@ import SectionStub from '@/pages/dashboard/SectionStub';
 import Shipments from '@/pages/dashboard/Shipments';
 import Dispatch from '@/pages/dashboard/Dispatch';
 import Vehicles from '@/pages/dashboard/Vehicles';
+import Settings from '@/pages/dashboard/Settings';
 
 // Owned by Track B (dispatcher and admin). Replace a SectionStub with the real page in each branch.
 export const dashboardRoutes: RouteObject[] = [
@@ -23,7 +24,7 @@ export const dashboardRoutes: RouteObject[] = [
           { path: 'vehicles', element: <Vehicles /> },
           {
             element: <ProtectedRoute roles={['BUSINESS_ADMIN']} />,
-            children: [{ path: 'settings', element: <SectionStub title="Settings" /> }],
+            children: [{ path: 'settings', element: <Settings /> }],
           },
           {
             element: <ProtectedRoute roles={['SUPER_ADMIN']} />,
