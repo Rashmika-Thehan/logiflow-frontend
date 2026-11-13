@@ -1,4 +1,4 @@
-import { api, API_ORIGIN } from './client';
+import { api, API_ORIGIN, getRefreshToken } from './client';
 import type { UserContext } from '@/types';
 
 export interface LoginInput {
@@ -11,10 +11,16 @@ export interface RegisterInput {
   password: string;
 }
 
+export interface AuthResponse {
+  message: string;
+  accessToken?: string;
+  refreshToken?: string;
+}
+
 export const authApi = {
-  login: (input: LoginInput) => api.post<{ message: string }>('/auth/login', input),
-  register: (input: RegisterInput) => api.post<{ message: string }>('/auth/register', input),
+  login: (input: LoginInput) => api.post<AuthResponse>('/auth/login', input),
+  register: (input: RegisterInput) => api.post<AuthResponse>('/auth/register', input),
   me: () => api.get<UserContext>('/auth/me').then((res) => res.data),
-  logout: () => api.post('/auth/logout'),
+  logout: () => api.post('/auth/logout', { refreshToken: getRefreshToken() || undefined }),
   googleUrl: `${API_ORIGIN}/api/v1/auth/google`,
 };

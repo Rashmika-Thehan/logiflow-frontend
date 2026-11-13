@@ -6,6 +6,7 @@ import Register from '@/pages/auth/Register';
 import Onboarding from '@/pages/onboarding/Onboarding';
 import AcceptInvite from '@/pages/auth/AcceptInvite';
 import Join from '@/pages/auth/Join';
+import OAuthCallback from '@/pages/auth/OAuthCallback';
 
 // Owned by Track A (public and auth).
 export const authRoutes: RouteObject[] = [
@@ -16,6 +17,7 @@ export const authRoutes: RouteObject[] = [
             { path: 'register', element: <Register /> },
             { path: 'join', element: <Join /> },
             { path: 'invite/accept', element: <AcceptInvite /> },
+            { path: 'auth/callback', element: <OAuthCallback /> },
         ],
     },
     {

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { alertsApi } from '@/api/alerts.api';
 import { authApi } from '@/api/auth.api';
-import { API_ORIGIN } from '@/api/client';
+import { API_ORIGIN, getAccessToken } from '@/api/client';
 import { playAlertTone } from '@/lib/audio';
 import { useAlertsStore } from '@/stores/alertsStore';
 import type { AlertNotification } from '@/types';
@@ -29,7 +29,11 @@ export function useAlertsSSE() {
                 .catch(() => undefined);
 
         const connect = () => {
-            source = new EventSource(`${API_ORIGIN}/api/v1/alerts/stream`, { withCredentials: true });
+            const token = getAccessToken();
+            const streamUrl = token
+                ? `${API_ORIGIN}/api/v1/alerts/stream?token=${encodeURIComponent(token)}`
+                : `${API_ORIGIN}/api/v1/alerts/stream`;
+            source = new EventSource(streamUrl, { withCredentials: true });
 
             source.onopen = () => {
                 attempt = 0;

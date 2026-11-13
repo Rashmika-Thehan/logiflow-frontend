@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { setSessionExpiredHandler } from '@/api/client';
+import { clearTokens, setSessionExpiredHandler, setTokens } from '@/api/client';
 import type { UserContext, UserRole } from '@/types';
 import { authApi, type LoginInput, type RegisterInput } from '@/api/auth.api';
 
@@ -24,21 +24,39 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     if (get().status !== 'idle') return;
     set({ status: 'loading' });
     try {
+      // Pick up tokens if arriving from OAuth redirect
+      if (typeof window !== 'undefined') {
+        const params = new URLSearchParams(window.location.search);
+        const urlAccessToken = params.get('accessToken');
+        const urlRefreshToken = params.get('refreshToken');
+        if (urlAccessToken) {
+          setTokens(urlAccessToken, urlRefreshToken || undefined);
+          params.delete('accessToken');
+          params.delete('refreshToken');
+          const remaining = params.toString();
+          const cleanUrl = window.location.pathname + (remaining ? `?${remaining}` : '') + window.location.hash;
+          window.history.replaceState({}, document.title, cleanUrl);
+        }
+      }
+
       set({ user: await authApi.me(), status: 'authenticated' });
     } catch {
+      clearTokens();
       set({ user: null, status: 'anonymous' });
     }
   },
 
   register: async (input) => {
-    await authApi.register(input);
+    const res = await authApi.register(input);
+    setTokens(res.data?.accessToken, res.data?.refreshToken);
     const user = await authApi.me();
     set({ user, status: 'authenticated' });
     return user;
   },
 
   login: async (input) => {
-    await authApi.login(input);
+    const res = await authApi.login(input);
+    setTokens(res.data?.accessToken, res.data?.refreshToken);
     const user = await authApi.me();
     set({ user, status: 'authenticated' });
     return user;
@@ -48,11 +66,15 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       await authApi.logout();
     } finally {
+      clearTokens();
       set({ user: null, status: 'anonymous' });
     }
   },
 
-  clear: () => set({ user: null, status: 'anonymous' }),
+  clear: () => {
+    clearTokens();
+    set({ user: null, status: 'anonymous' });
+  },
 }));
 
 setSessionExpiredHandler(() => useAuthStore.getState().clear());
