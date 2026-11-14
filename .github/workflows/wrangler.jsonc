@@ -1,0 +1,10 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "logiflow-frontend",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": "./dist",
+    // React Router SPA: unknown paths (e.g. /dashboard/fleet on refresh) serve index.html
+    "not_found_handling": "single-page-application"
+  }
+}
