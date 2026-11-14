@@ -3,8 +3,8 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Check, PaperPlaneTilt, UserPlus, Users, X } from '@phosphor-icons/react';
-import { invitationsApi, joinRequestsAdminApi } from '@/api/org.api';
+import { Check, PaperPlaneTilt, UserPlus, Users, X, IdentificationBadge } from '@phosphor-icons/react';
+import { invitationsApi, joinRequestsAdminApi, driversAdminApi } from '@/api/org.api';
 import { usersApi } from '@/api/users.api';
 import { getErrorMessage } from '@/api/client';
 import { Button } from '@/components/ui/button';
@@ -12,7 +12,7 @@ import { Field } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Modal } from '@/components/ui/modal';
 import { formatDate } from '@/lib/format';
-import type { JoinRequest, UserRole } from '@/types';
+import type { JoinRequest, UserRole, TeamMember } from '@/types';
 
 const inviteSchema = z.object({
   email: z.string().trim().min(1, 'Enter an email address.').email('Enter a valid email address.'),
@@ -30,6 +30,7 @@ const roleBadge: Record<UserRole, { label: string; style: string }> = {
 export function TeamTab() {
   const queryClient = useQueryClient();
   const [inviteOpen, setInviteOpen] = useState(false);
+  const [onboardingDriver, setOnboardingDriver] = useState<TeamMember | null>(null);
   const [rejectingRequest, setRejectingRequest] = useState<JoinRequest | null>(null);
   const [rejectReason, setRejectReason] = useState('');
   const [notice, setNotice] = useState<{ tone: 'ok' | 'error'; text: string } | null>(null);
@@ -193,6 +194,7 @@ export function TeamTab() {
                     <th className="px-4 py-3 font-medium">Phone</th>
                     <th className="px-4 py-3 font-medium">Role</th>
                     <th className="px-4 py-3 font-medium">Joined</th>
+                    <th className="px-4 py-3 font-medium text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-surface-5 body-6">
@@ -208,6 +210,19 @@ export function TeamTab() {
                       </td>
                       <td className="px-4 py-3 text-fg-muted">
                         {m.createdAt ? formatDate(m.createdAt) : '—'}
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        {m.role === 'DRIVER' && (
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            onClick={() => setOnboardingDriver(m)}
+                            className="gap-1.5"
+                          >
+                            <IdentificationBadge size={15} />
+                            Onboard License
+                          </Button>
+                        )}
                       </td>
                     </tr>
                   ))}
@@ -290,6 +305,23 @@ export function TeamTab() {
           refreshAll();
         }}
       />
+
+      {/* Onboard Driver Modal */}
+      {onboardingDriver && (
+        <OnboardDriverModal
+          driver={onboardingDriver}
+          onClose={() => setOnboardingDriver(null)}
+          onSuccess={() => {
+            const name = onboardingDriver.fullName || onboardingDriver.email;
+            setOnboardingDriver(null);
+            setNotice({
+              tone: 'ok',
+              text: `Driver "${name}" onboarded & license verified! Assign a vehicle in Fleet to activate.`,
+            });
+            refreshAll();
+          }}
+        />
+      )}
 
       {/* Reject Join Request Modal */}
       <Modal
@@ -394,6 +426,113 @@ function InviteTeammateModal({
           <Button type="submit" disabled={isSubmitting} className="gap-2">
             <PaperPlaneTilt size={16} />
             {isSubmitting ? 'Sending...' : 'Send Invitation'}
+          </Button>
+        </div>
+      </form>
+    </Modal>
+  );
+}
+
+const onboardSchema = z.object({
+  licenseNumber: z.string().trim().min(3, 'License number is required'),
+  licenseExpiry: z.string().min(1, 'License expiry date is required'),
+  emergencyContactName: z.string().trim().min(2, 'Emergency contact name is required'),
+  emergencyContactPhone: z.string().trim().min(5, 'Emergency contact phone is required'),
+});
+type OnboardValues = z.infer<typeof onboardSchema>;
+
+function OnboardDriverModal({
+  driver,
+  onClose,
+  onSuccess,
+}: {
+  driver: TeamMember;
+  onClose: () => void;
+  onSuccess: () => void;
+}) {
+  const [errorMsg, setErrorMsg] = useState('');
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<OnboardValues>({
+    resolver: zodResolver(onboardSchema),
+    defaultValues: {
+      licenseNumber: '',
+      licenseExpiry: '',
+      emergencyContactName: '',
+      emergencyContactPhone: driver.phone || '',
+    },
+  });
+
+  const onSubmit = async (values: OnboardValues) => {
+    setErrorMsg('');
+    try {
+      try {
+        await driversAdminApi.onboard({
+          userId: driver.id,
+          licenseNumber: values.licenseNumber,
+          licenseExpiry: values.licenseExpiry,
+          emergencyContactName: values.emergencyContactName,
+          emergencyContactPhone: values.emergencyContactPhone,
+        });
+      } catch (err: any) {
+        if (err?.response?.status === 409 || err?.response?.data?.message?.includes('already')) {
+          // Already created, proceed to verify
+        } else {
+          throw err;
+        }
+      }
+
+      await driversAdminApi.verifyLicense(driver.id);
+      onSuccess();
+    } catch (err) {
+      setErrorMsg(getErrorMessage(err, 'Failed to complete driver onboarding'));
+    }
+  };
+
+  return (
+    <Modal open={true} onClose={onClose} title="Onboard Driver & Verify License">
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+        {errorMsg && (
+          <p role="alert" className="caption-2 text-status-urgent">
+            {errorMsg}
+          </p>
+        )}
+
+        <div className="rounded-xl border border-surface-5 bg-surface-3/50 p-3">
+          <p className="caption-1 font-medium text-fg">{driver.fullName || 'Driver'}</p>
+          <p className="caption-2 text-fg-muted">{driver.email}</p>
+        </div>
+
+        <Field label="Driver License Number" error={errors.licenseNumber?.message}>
+          <Input placeholder="e.g. DL-9832049" {...register('licenseNumber')} />
+        </Field>
+
+        <Field label="License Expiry Date" error={errors.licenseExpiry?.message}>
+          <Input type="date" {...register('licenseExpiry')} />
+        </Field>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <Field label="Emergency Contact Name" error={errors.emergencyContactName?.message}>
+            <Input placeholder="e.g. Maria Silva" {...register('emergencyContactName')} />
+          </Field>
+          <Field label="Emergency Contact Phone" error={errors.emergencyContactPhone?.message}>
+            <Input placeholder="e.g. +1 555-019-2834" {...register('emergencyContactPhone')} />
+          </Field>
+        </div>
+
+        <p className="caption-2 text-fg-muted">
+          Submitting this form creates the compliance profile in the fleet management service and verifies the driver&apos;s license credentials immediately.
+        </p>
+
+        <div className="flex justify-end gap-2 pt-2">
+          <Button type="button" variant="ghost" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button type="submit" disabled={isSubmitting} className="gap-2">
+            <IdentificationBadge size={16} />
+            {isSubmitting ? 'Onboarding...' : 'Onboard & Verify'}
           </Button>
         </div>
       </form>

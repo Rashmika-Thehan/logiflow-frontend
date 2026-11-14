@@ -1,6 +1,7 @@
 import gsap from 'gsap';
 import { useLayoutEffect, useRef, useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { MagnifyingGlass, SteeringWheel } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { DispatchPreview } from './DispatchPreview';
@@ -51,25 +52,35 @@ export function Hero() {
             <Button asChild size="lg">
               <Link to="/register">Start free trial</Link>
             </Button>
-            <p className="caption-2 text-fg-muted">14 day trial for logistics teams</p>
+            <Button asChild variant="secondary" size="lg" className="gap-2">
+              <Link to="/driver/apply">
+                <SteeringWheel size={18} />
+                Drive with us
+              </Link>
+            </Button>
+            <p className="caption-2 text-fg-muted w-full sm:w-auto">14 day trial for logistics teams • Instant driver signup</p>
           </div>
-          <form onSubmit={onTrack} noValidate className="hero-elem flex max-w-md flex-col gap-2">
+          <form onSubmit={onTrack} noValidate className="hero-elem flex max-w-md flex-col gap-2 pt-2">
             <label htmlFor="hero-track" className="caption-1 text-fg-muted">
-              Have a tracking code?
+              Have a parcel tracking code?
             </label>
             <div className="flex gap-2">
-              <Input
-                id="hero-track"
-                value={code}
-                onChange={(e) => {
-                  setCode(e.target.value);
-                  setError('');
-                }}
-                placeholder="Enter your tracking code"
-                aria-invalid={!!error}
-                aria-describedby={error ? 'hero-track-error' : undefined}
-              />
-              <Button type="submit" variant="secondary" size="sm">
+              <div className="relative flex-1">
+                <Input
+                  id="hero-track"
+                  value={code}
+                  onChange={(e) => {
+                    setCode(e.target.value);
+                    setError('');
+                  }}
+                  placeholder="e.g. LF-8F32D19"
+                  aria-invalid={!!error}
+                  aria-describedby={error ? 'hero-track-error' : undefined}
+                  className="font-mono"
+                />
+              </div>
+              <Button type="submit" variant="secondary" size="sm" className="gap-1.5 shrink-0">
+                <MagnifyingGlass size={16} />
                 Track
               </Button>
             </div>

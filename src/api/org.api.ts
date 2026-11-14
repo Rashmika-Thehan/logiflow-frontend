@@ -67,3 +67,20 @@ export const apiKeysApi = {
         api.post<CreatedApiKey>('/api-keys', input).then((res) => res.data),
     revoke: (id: string) => api.delete(`/api-keys/${id}`).then((res) => res.data),
 };
+
+export interface OnboardDriverInput {
+    userId: string;
+    licenseNumber: string;
+    licenseExpiry: string;
+    emergencyContactName: string;
+    emergencyContactPhone: string;
+}
+
+export const driversAdminApi = {
+    onboard: (input: OnboardDriverInput) =>
+        api.post('/drivers', input).then((res) => res.data),
+    get: (id: string) =>
+        api.get(`/drivers/${id}`).then((res) => res.data),
+    verifyLicense: (id: string) =>
+        api.patch(`/drivers/${id}/verify-license`).then((res) => res.data),
+};

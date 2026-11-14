@@ -16,6 +16,7 @@ export const authRoutes: RouteObject[] = [
             { path: 'login', element: <Login /> },
             { path: 'register', element: <Register /> },
             { path: 'join', element: <Join /> },
+            { path: 'accept-invite', element: <AcceptInvite /> },
             { path: 'invite/accept', element: <AcceptInvite /> },
             { path: 'auth/callback', element: <OAuthCallback /> },
         ],

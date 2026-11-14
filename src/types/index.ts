@@ -85,6 +85,21 @@ export interface DriverTelemetry {
   shipmentId?: string;
 }
 
+export interface DriverProfile {
+  id: string;
+  tenantId: string;
+  licenseNumber: string;
+  licenseExpiry: string;
+  licenseVerifiedAt?: string | null;
+  shiftStatus: ShiftStatus;
+  currentLat?: number | null;
+  currentLng?: number | null;
+  assignedVehicleId?: string | null;
+  vehicle?: Vehicle | null;
+  emergencyContactName?: string;
+  emergencyContactPhone?: string;
+}
+
 export interface Paginated<T> {
   data: T[];
   page: number;
