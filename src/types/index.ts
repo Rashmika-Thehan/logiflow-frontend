@@ -196,3 +196,29 @@ export interface PlatformDriverItem extends PlatformDriverRow {
   user?: PlatformDriverUser;
 }
 
+export interface PublicTracking {
+  trackingCode: string;
+  status: ShipmentStatus | string;
+  priority: PriorityTier | string;
+  deliveryWindowStart?: string;
+  deliveryWindowEnd?: string;
+  createdAt?: string;
+}
+
+export interface LiveTripPosition {
+  lat: number;
+  lng: number;
+  ts: number;
+  heading?: number;
+  eta?: number | null;
+}
+
+export interface LiveTripSubscribeResponse {
+  ok: boolean;
+  status?: string;
+  destLat?: number;
+  destLng?: number;
+  error?: string;
+}
+
+
