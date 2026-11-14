@@ -166,3 +166,33 @@ export interface CreatedApiKey {
   apiKey: string;
   keyPrefix: string;
 }
+
+export interface PlatformDriverRow {
+  driverId: string;
+  shiftStatus: ShiftStatus;
+  createdAt: string;
+  licenseNumber: string;
+  licenseExpiry: string;
+  licenseVerifiedAt: string | null;
+  vehicle: {
+    id: string;
+    licensePlate: string;
+    vehicleClass: VehicleClass;
+    insuranceExpiry?: string | null;
+  } | null;
+  eligible: boolean;
+  blocker: string | null;
+}
+
+export interface PlatformDriverUser {
+  id: string;
+  email: string;
+  fullName: string;
+  phone?: string;
+  createdAt: string;
+}
+
+export interface PlatformDriverItem extends PlatformDriverRow {
+  user?: PlatformDriverUser;
+}
+
