@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { getErrorMessage } from '@/api/client';
@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Field } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Modal } from '@/components/ui/modal';
+import { AddressSearch } from '@/components/dashboard/AddressSearch';
 
 const positive = (label: string) => z.number({ message: `Enter the ${label}.` }).positive(`Enter the ${label}.`);
 
@@ -18,8 +19,8 @@ const schema = z
         recipientPhone: z.string().regex(/^\+?[0-9 ]{7,15}$/, 'Enter a phone number with country code.'),
         recipientEmail: z.string().email('Enter a valid email address.').or(z.literal('')),
         recipientAddress: z.string().trim().min(5, 'Enter the delivery address.'),
-        recipientLat: z.number({ message: 'Enter a latitude.' }).min(-90).max(90),
-        recipientLng: z.number({ message: 'Enter a longitude.' }).min(-180).max(180),
+        recipientLat: z.number({ message: 'Select an address from the search list or enter latitude manually.' }).min(-90).max(90),
+        recipientLng: z.number({ message: 'Select an address from the search list or enter longitude manually.' }).min(-180).max(180),
         weightKg: positive('weight in kg'),
         lengthCm: positive('length in cm'),
         widthCm: positive('width in cm'),
@@ -47,8 +48,22 @@ export function CreateShipmentDialog({ open, onClose, onCreated }: Props) {
     const {
         register,
         handleSubmit,
+        setValue,
+        watch,
+        reset,
         formState: { errors },
     } = useForm<Values>({ resolver: zodResolver(schema), defaultValues: { priority: 'STANDARD' } });
+
+    useEffect(() => {
+        if (open) {
+            reset({ priority: 'STANDARD' });
+            setFormError('');
+        }
+    }, [open, reset]);
+
+    const watchedAddress = watch('recipientAddress');
+    const watchedLat = watch('recipientLat');
+    const watchedLng = watch('recipientLng');
 
     const create = useMutation({
         mutationFn: (input: CreateShipmentInput) => shipmentsApi.create(input),
@@ -82,17 +97,28 @@ export function CreateShipmentDialog({ open, onClose, onCreated }: Props) {
                         <Input id="recipientEmail" type="email" autoComplete="off" {...register('recipientEmail')} />
                     </Field>
                 </div>
-                <Field id="recipientAddress" label="Delivery address" error={errors.recipientAddress?.message}>
-                    <Input id="recipientAddress" autoComplete="off" {...register('recipientAddress')} />
+                <Field id="recipientAddress" label="Delivery address">
+                    <AddressSearch
+                        addressValue={watchedAddress || ''}
+                        latValue={watchedLat}
+                        lngValue={watchedLng}
+                        onSelect={(res) => {
+                            setValue('recipientAddress', res.address, { shouldValidate: true });
+                            setValue('recipientLat', res.lat, { shouldValidate: true });
+                            setValue('recipientLng', res.lng, { shouldValidate: true });
+                        }}
+                        onAddressChange={(address) => {
+                            setValue('recipientAddress', address, { shouldValidate: address.length >= 5 });
+                        }}
+                        onManualCoordChange={(lat, lng) => {
+                            setValue('recipientLat', lat, { shouldValidate: true });
+                            setValue('recipientLng', lng, { shouldValidate: true });
+                        }}
+                        addressError={errors.recipientAddress?.message}
+                        latError={errors.recipientLat?.message}
+                        lngError={errors.recipientLng?.message}
+                    />
                 </Field>
-                <div className="grid gap-4 sm:grid-cols-2">
-                    <Field id="recipientLat" label="Latitude" error={errors.recipientLat?.message}>
-                        <Input id="recipientLat" inputMode="decimal" {...num('recipientLat')} />
-                    </Field>
-                    <Field id="recipientLng" label="Longitude" error={errors.recipientLng?.message}>
-                        <Input id="recipientLng" inputMode="decimal" {...num('recipientLng')} />
-                    </Field>
-                </div>
                 <div className="grid gap-4 sm:grid-cols-4">
                     <Field id="weightKg" label="Weight (kg)" error={errors.weightKg?.message}>
                         <Input id="weightKg" inputMode="decimal" {...num('weightKg')} />
