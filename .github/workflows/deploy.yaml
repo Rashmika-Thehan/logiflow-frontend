@@ -34,7 +34,6 @@ jobs:
         run: npm run build
         env:
           # Vite bakes these into the bundle at build time (they are public).
-          # Rename to match the keys in your .env.example.
           VITE_API_URL: ${{ vars.VITE_API_URL }}
           VITE_GOOGLE_CALLBACK_URL: ${{ vars.VITE_GOOGLE_CALLBACK_URL }}
 
@@ -43,4 +42,5 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: "4"
           command: deploy
