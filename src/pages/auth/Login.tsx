@@ -85,12 +85,20 @@ export default function Login() {
           Continue with Google
         </Button>
       </form>
-      <p className="body-6 text-fg-muted">
-        New to LogiFlow?{' '}
-        <Link to="/register" className="text-fg underline">
-          Create an organization
-        </Link>
-      </p>
+      <div className="flex flex-col gap-2 pt-2 text-center">
+        <p className="body-6 text-fg-muted">
+          New to LogiFlow?{' '}
+          <Link to="/register" className="text-fg underline">
+            Create an organization
+          </Link>
+        </p>
+        <p className="caption-1 text-fg-muted border-t border-surface-4 pt-3">
+          Are you a courier driver?{' '}
+          <Link to="/driver/login" className="text-fg font-medium underline">
+            Go to Driver Portal →
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }

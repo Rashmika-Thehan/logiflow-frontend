@@ -25,6 +25,16 @@ export function PublicLayout() {
               </Link>
             </li>
             <li>
+              <Link to="/driver/login" className="hover:text-fg">
+                Driver portal
+              </Link>
+            </li>
+            <li>
+              <Link to="/driver/apply" className="hover:text-fg">
+                Drive with us
+              </Link>
+            </li>
+            <li>
               <Link to="/login" className="hover:text-fg">
                 Sign in
               </Link>

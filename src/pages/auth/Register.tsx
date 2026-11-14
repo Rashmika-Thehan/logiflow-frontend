@@ -72,9 +72,17 @@ export default function Register() {
                     Continue with Google
                 </Button>
             </form>
-            <p className="body-6 text-fg-muted">
-                Already have an account? <Link to="/login" className="text-fg underline">Sign in</Link>
-            </p>
+            <div className="flex flex-col gap-2 pt-2 text-center">
+                <p className="body-6 text-fg-muted">
+                    Already have an account? <Link to="/login" className="text-fg underline">Sign in</Link>
+                </p>
+                <p className="caption-1 text-fg-muted border-t border-surface-4 pt-3">
+                    Looking to drive with LogiFlow?{' '}
+                    <Link to="/driver/apply" className="text-fg font-medium underline">
+                        Apply as a driver →
+                    </Link>
+                </p>
+            </div>
         </div>
     );
 }

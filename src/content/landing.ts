@@ -6,6 +6,7 @@ export const navLinks = [
   { label: 'How it works', href: '/#how-it-works' },
   { label: 'FAQ', href: '/#faq' },
   { label: 'Track a parcel', href: '/track' },
+  { label: 'Driver Portal', href: '/driver/login' },
 ];
 
 export const stats = [

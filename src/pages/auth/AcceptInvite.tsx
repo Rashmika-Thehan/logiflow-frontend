@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { z } from 'zod';
 import { invitationsApi } from '@/api/join.api';
 import { getErrorMessage } from '@/api/client';
@@ -20,7 +20,12 @@ type Values = z.infer<typeof schema>;
 
 export default function AcceptInvite() {
     const [params] = useSearchParams();
-    const token = params.get('token');
+    const location = useLocation();
+
+    // The backend email sends `${base}/accept-invite#token=...` (hash fragment)
+    // but some links may also arrive via search query `?token=...`.
+    const hashParams = new URLSearchParams(location.hash.replace(/^#/, ''));
+    const token = params.get('token') || hashParams.get('token');
     const navigate = useNavigate();
     const [formError, setFormError] = useState('');
     const {

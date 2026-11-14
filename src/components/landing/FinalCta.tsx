@@ -10,9 +10,14 @@ export function FinalCta() {
         <p className="body-3 max-w-[680px] text-fg-muted">
           Create your organization, add a depot, and share your join code with drivers today.
         </p>
-        <Button asChild size="lg">
-          <Link to="/register">Start free trial</Link>
-        </Button>
+        <div className="flex flex-wrap items-center gap-3">
+          <Button asChild size="lg">
+            <Link to="/register">Start free trial</Link>
+          </Button>
+          <Button asChild variant="secondary" size="lg">
+            <Link to="/driver/apply">Apply as driver</Link>
+          </Button>
+        </div>
       </Reveal>
     </section>
   );
