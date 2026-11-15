@@ -64,6 +64,15 @@ export default function Shipments() {
         onError: (err) => setNotice({ tone: 'error', text: getErrorMessage(err, 'A new delivery code could not be sent. Try again.') }),
     });
 
+    const retryMutation = useMutation({
+        mutationFn: (s: Shipment) => shipmentsApi.retry(s.id),
+        onSuccess: (_r, s) => {
+            setNotice({ tone: 'ok', text: `Shipment ${s.trackingCode} was re-queued for dispatch.` });
+            void refresh();
+        },
+        onError: (err) => setNotice({ tone: 'error', text: getErrorMessage(err, 'Failed to retry shipment. Try again.') }),
+    });
+
     const setFilter = (next: ShipmentStatus | '') =>
         setParams((p) => {
             const copy = new URLSearchParams(p);
@@ -183,6 +192,16 @@ export default function Shipments() {
                                     </td>
                                     <td className="px-4 py-3">
                                         <div className="flex gap-1">
+                                            {s.status === 'FAILED' && (
+                                                <Button
+                                                    variant="secondary"
+                                                    size="sm"
+                                                    disabled={retryMutation.isPending}
+                                                    onClick={() => retryMutation.mutate(s)}
+                                                >
+                                                    {retryMutation.isPending ? 'Retrying...' : 'Retry'}
+                                                </Button>
+                                            )}
                                             {s.status === 'IN_TRANSIT' && (
                                                 <Button variant="ghost" size="sm" disabled={reissue.isPending} onClick={() => reissue.mutate(s)}>
                                                     Reissue code

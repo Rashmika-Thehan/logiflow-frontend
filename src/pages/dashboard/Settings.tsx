@@ -1,13 +1,14 @@
 import { useSearchParams } from 'react-router-dom';
-import { Buildings, Key, QrCode, SlidersHorizontal, Users } from '@phosphor-icons/react';
+import { Buildings, Key, QrCode, SlidersHorizontal, Users, User } from '@phosphor-icons/react';
 import { PageShell } from '@/components/dashboard/PageShell';
+import { ProfileTab } from '@/components/dashboard/settings/ProfileTab';
 import { BranchesTab } from '@/components/dashboard/settings/BranchesTab';
 import { TeamTab } from '@/components/dashboard/settings/TeamTab';
 import { JoinCodeTab } from '@/components/dashboard/settings/JoinCodeTab';
 import { DispatchPolicyTab } from '@/components/dashboard/settings/DispatchPolicyTab';
 import { ApiKeysTab } from '@/components/dashboard/settings/ApiKeysTab';
 
-type TabKey = 'branches' | 'team' | 'join-code' | 'policy' | 'api-keys';
+type TabKey = 'profile' | 'branches' | 'team' | 'join-code' | 'policy' | 'api-keys';
 
 interface TabItem {
   key: TabKey;
@@ -16,6 +17,7 @@ interface TabItem {
 }
 
 const TABS: TabItem[] = [
+  { key: 'profile', label: 'My Profile', icon: User },
   { key: 'branches', label: 'Depots', icon: Buildings },
   { key: 'team', label: 'Team & Access', icon: Users },
   { key: 'join-code', label: 'Join Code', icon: QrCode },
@@ -27,7 +29,7 @@ export default function Settings() {
   const [params, setParams] = useSearchParams();
   const currentTab = (TABS.some((t) => t.key === params.get('tab'))
     ? (params.get('tab') as TabKey)
-    : 'branches');
+    : 'profile');
 
   const selectTab = (tab: TabKey) => {
     setParams(
@@ -67,6 +69,7 @@ export default function Settings() {
 
         {/* Tab Content */}
         <div className="min-h-[400px]">
+          {currentTab === 'profile' && <ProfileTab />}
           {currentTab === 'branches' && <BranchesTab />}
           {currentTab === 'team' && <TeamTab />}
           {currentTab === 'join-code' && <JoinCodeTab />}

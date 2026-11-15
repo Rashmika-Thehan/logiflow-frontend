@@ -93,6 +93,12 @@ export const driverApi = {
     api.post(`/deliveries/${shipmentId}/fail`, { reasonCode, photoUrl }).then((r) => r.data),
 
   /**
+   * Drops an accepted delivery before package collection, releasing driver and returning shipment to queue.
+   */
+  dropDelivery: (shipmentId: string, reason?: string): Promise<void> =>
+    api.post(`/deliveries/${shipmentId}/drop`, { reason }).then((r) => r.data),
+
+  /**
    * Fetches past offers and assignment history.
    */
   getPastOffers: (): Promise<AssignmentOffer[]> =>

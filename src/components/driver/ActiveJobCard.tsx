@@ -131,6 +131,20 @@ export function ActiveJobCard({ job, onRefresh }: Props) {
             <Package size={16} />
             {loadingAction === 'collected' ? 'Updating...' : 'Confirm Package Collected'}
           </Button>
+
+          <Button
+            size="sm"
+            variant="ghost"
+            disabled={!!loadingAction}
+            onClick={() => {
+              if (window.confirm('Are you sure you want to drop this delivery? It will return to the dispatch queue for other drivers.')) {
+                void handleAction('drop', () => driverApi.dropDelivery(job.id, 'DRIVER_INITIATED_DROP'));
+              }
+            }}
+            className="w-full text-xs text-status-urgent hover:bg-status-urgent/10 hover:text-status-urgent mt-1"
+          >
+            {loadingAction === 'drop' ? 'Dropping delivery...' : 'Drop / Cancel This Assignment'}
+          </Button>
         </div>
       )}
 

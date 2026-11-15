@@ -38,6 +38,7 @@ export const shipmentsApi = {
   list: (params: ListShipmentsParams) => api.get<Paginated<Shipment>>('/shipments', { params }).then((r) => r.data),
   create: (input: CreateShipmentInput) => api.post<Shipment>('/shipments', input).then((r) => r.data),
   cancel: (id: string) => api.post(`/shipments/${id}/cancel`),
+  retry: (id: string) => api.post<Shipment>(`/shipments/${id}/retry`).then((r) => r.data),
   reissueOtp: (id: string) => api.post(`/shipments/${id}/reissue-otp`),
   batchImport: (file: File) => {
     const form = new FormData();
