@@ -31,11 +31,17 @@ export default function Dispatch() {
     const pending = useQueue('PENDING');
     const dispatching = useQueue('DISPATCHING');
 
-    const queue = useMemo(
-        () =>
-            [...(pending.data?.data ?? []), ...(dispatching.data?.data ?? [])].sort(
+    const queue = useMemo(() => {
+            const seen = new Set<string>();
+            const merged = [...(pending.data?.data ?? []), ...(dispatching.data?.data ?? [])].filter((s) => {
+                if (seen.has(s.id)) return false;
+                seen.add(s.id);
+                return true;
+            });
+            return merged.sort(
                 (a, b) => priorityRank(a.priority) - priorityRank(b.priority) || a.createdAt.localeCompare(b.createdAt),
-            ),
+            );
+        },
         [pending.data, dispatching.data],
     );
     const selected: Shipment | undefined = queue.find((s) => s.id === selectedId);
