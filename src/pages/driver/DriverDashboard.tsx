@@ -97,22 +97,38 @@ export default function DriverDashboard() {
   useEffect(() => {
     if (!isAvailable || activeJob) return;
     void pollActiveOffer();
-    const interval = setInterval(pollActiveOffer, 6000);
+    const interval = setInterval(pollActiveOffer, 3000);
     return () => clearInterval(interval);
   }, [isAvailable, activeJob, pollActiveOffer]);
 
-  // Restore active delivery on mount if driver accepted a job
+  // Restore active delivery on mount or while BUSY
   useEffect(() => {
     if (activeJob) return;
-    void driverApi.getActiveDelivery().then(async (accepted) => {
-      if (accepted && accepted.shipmentId) {
-        const job = await driverApi.getJobView(accepted.shipmentId).catch(() => null);
-        if (job && job.status !== 'DELIVERED') {
-          setActiveJob(job);
+    let isSubscribed = true;
+
+    const syncActiveJob = async () => {
+      try {
+        const accepted = await driverApi.getActiveDelivery();
+        if (accepted && accepted.shipmentId && isSubscribed) {
+          const job = await driverApi.getJobView(accepted.shipmentId).catch(() => null);
+          if (job && job.status !== 'DELIVERED' && isSubscribed) {
+            setActiveJob(job);
+          }
         }
+      } catch {
+        // ignore
       }
-    });
-  }, [activeJob]);
+    };
+
+    void syncActiveJob();
+
+    // If driver is BUSY, poll every 3 seconds until activeJob loads
+    const interval = currentShift === 'BUSY' ? setInterval(syncActiveJob, 3000) : null;
+    return () => {
+      isSubscribed = false;
+      if (interval) clearInterval(interval);
+    };
+  }, [activeJob, currentShift]);
 
   // 4. GPS Location Ingestion (Self-report location while on shift)
   useEffect(() => {
@@ -143,17 +159,29 @@ export default function DriverDashboard() {
 
   // Handle Offer Response
   const handleAcceptOffer = async (offerId: string) => {
+    const shipmentId = activeOffer?.shipmentId;
+    setActiveOffer(null);
     try {
       await driverApi.respondOffer(offerId, 'ACCEPT');
-      if (activeOffer) {
-        // Load the job view
-        const job = await driverApi.getJobView(activeOffer.shipmentId);
-        setActiveJob(job);
-      }
-      setActiveOffer(null);
       void refetchProfile();
-    } catch {
-      setActiveOffer(null);
+
+      if (shipmentId) {
+        // Poll for job view up to 6 times while Kafka updates shipment status to ASSIGNED
+        for (let i = 0; i < 6; i++) {
+          try {
+            const job = await driverApi.getJobView(shipmentId);
+            if (job) {
+              setActiveJob(job);
+              break;
+            }
+          } catch {
+            await new Promise((res) => setTimeout(res, 800));
+          }
+        }
+      }
+    } catch (err) {
+      setShiftError(getErrorMessage(err, 'Failed to accept offer.'));
+      void refetchProfile();
     }
   };
 
@@ -167,15 +195,19 @@ export default function DriverDashboard() {
 
   const refreshJob = async () => {
     if (!activeJob) return;
-    try {
-      const updated = await driverApi.getJobView(activeJob.id);
-      setActiveJob(updated);
-      if (updated.status === 'DELIVERED') {
+    const fetchLatest = async () => {
+      try {
+        const updated = await driverApi.getJobView(activeJob.id);
+        setActiveJob(updated);
+        if (updated.status === 'DELIVERED') {
+          void refetchProfile();
+        }
+      } catch {
         void refetchProfile();
       }
-    } catch {
-      setActiveJob(null);
-    }
+    };
+    await fetchLatest();
+    setTimeout(fetchLatest, 1500);
   };
 
   return (
@@ -249,6 +281,8 @@ export default function DriverDashboard() {
                 className={`h-2.5 w-2.5 rounded-full ${
                   currentShift === 'AVAILABLE'
                     ? 'bg-status-available animate-pulse'
+                    : currentShift === 'BUSY'
+                    ? 'bg-status-busy animate-pulse'
                     : currentShift === 'ON_BREAK'
                     ? 'bg-status-break'
                     : 'bg-surface-5'
@@ -257,6 +291,8 @@ export default function DriverDashboard() {
               <span className="caption-1 font-bold text-fg">
                 {currentShift === 'AVAILABLE'
                   ? 'Online & Available'
+                  : currentShift === 'BUSY'
+                  ? 'On Active Delivery'
                   : currentShift === 'ON_BREAK'
                   ? 'On Break'
                   : 'Offline'}
@@ -275,7 +311,7 @@ export default function DriverDashboard() {
           <div className="grid grid-cols-3 gap-2 pt-1">
             <button
               type="button"
-              disabled={shiftMutation.isPending || !!activeJob || !isEligibleToDrive}
+              disabled={shiftMutation.isPending || !!activeJob || currentShift === 'BUSY' || !isEligibleToDrive}
               onClick={() => {
                 if (!isEligibleToDrive) {
                   setShiftError(ineligibilityReason);
@@ -283,9 +319,9 @@ export default function DriverDashboard() {
                 }
                 shiftMutation.mutate('AVAILABLE');
               }}
-              title={!isEligibleToDrive ? ineligibilityReason : 'Go available'}
+              title={currentShift === 'BUSY' ? 'Complete active delivery first' : !isEligibleToDrive ? ineligibilityReason : 'Go available'}
               className={`flex flex-col items-center gap-1 rounded-2xl border p-2.5 text-center transition-all ${
-                !isEligibleToDrive
+                !isEligibleToDrive || currentShift === 'BUSY'
                   ? 'opacity-50 cursor-not-allowed border-surface-5 bg-surface-3 text-fg-muted'
                   : currentShift === 'AVAILABLE'
                   ? 'border-status-available bg-status-available/10 text-status-available font-bold shadow-sm'
@@ -298,10 +334,11 @@ export default function DriverDashboard() {
 
             <button
               type="button"
-              disabled={shiftMutation.isPending || !!activeJob || !profile}
+              disabled={shiftMutation.isPending || !!activeJob || currentShift === 'BUSY' || !profile}
               onClick={() => shiftMutation.mutate('ON_BREAK')}
+              title={currentShift === 'BUSY' ? 'Complete active delivery first' : 'Go on break'}
               className={`flex flex-col items-center gap-1 rounded-2xl border p-2.5 text-center transition-all ${
-                !profile
+                !profile || currentShift === 'BUSY'
                   ? 'opacity-50 cursor-not-allowed border-surface-5 bg-surface-3 text-fg-muted'
                   : currentShift === 'ON_BREAK'
                   ? 'border-status-break bg-status-break/10 text-status-break font-bold shadow-sm'
@@ -314,10 +351,11 @@ export default function DriverDashboard() {
 
             <button
               type="button"
-              disabled={shiftMutation.isPending || !!activeJob || !profile}
+              disabled={shiftMutation.isPending || !!activeJob || currentShift === 'BUSY' || !profile}
               onClick={() => shiftMutation.mutate('OFFLINE')}
+              title={currentShift === 'BUSY' ? 'Complete active delivery first' : 'Go offline'}
               className={`flex flex-col items-center gap-1 rounded-2xl border p-2.5 text-center transition-all ${
-                !profile
+                !profile || currentShift === 'BUSY'
                   ? 'opacity-50 cursor-not-allowed border-surface-5 bg-surface-3 text-fg-muted'
                   : currentShift === 'OFFLINE'
                   ? 'border-fg bg-surface-4 text-fg font-bold shadow-sm'
@@ -356,6 +394,34 @@ export default function DriverDashboard() {
                 <p className="caption-2 text-fg-muted mt-1 leading-relaxed">
                   Your GPS location is live and you are in the automated dispatch queue. When an order matches your route, a 45-second offer will pop up.
                 </p>
+              </div>
+            )}
+
+            {currentShift === 'BUSY' && (
+              <div className="rounded-3xl border border-surface-5 bg-surface-2 p-8 text-center shadow-sm">
+                <div className="relative mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-status-busy/10 text-status-busy mb-3">
+                  <Broadcast size={32} className="animate-pulse" />
+                  <span className="absolute h-full w-full rounded-full border-2 border-status-busy/30 animate-ping" />
+                </div>
+                <h3 className="heading-6 text-fg">Active Delivery in Progress</h3>
+                <p className="caption-2 text-fg-muted mt-1 leading-relaxed">
+                  Your delivery has been accepted. Syncing route and shipment details...
+                </p>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={async () => {
+                    void refetchProfile();
+                    const active = await driverApi.getActiveDelivery();
+                    if (active?.shipmentId) {
+                      const job = await driverApi.getJobView(active.shipmentId).catch(() => null);
+                      if (job) setActiveJob(job);
+                    }
+                  }}
+                  className="mt-4 gap-1.5"
+                >
+                  Sync Delivery
+                </Button>
               </div>
             )}
 
