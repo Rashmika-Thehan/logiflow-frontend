@@ -11,6 +11,7 @@ import {
   Warning,
 } from '@phosphor-icons/react';
 import { driverApi } from '@/api/driver.api';
+import { trackingApi } from '@/api/tracking.api';
 import { getErrorMessage } from '@/api/client';
 import { useAuthStore } from '@/stores/authStore';
 import { IncomingOfferModal } from '@/components/driver/IncomingOfferModal';
@@ -107,6 +108,16 @@ export default function DriverDashboard() {
     const watchId = navigator.geolocation.watchPosition(
       (pos) => {
         void driverApi.updateLocation(pos.coords.latitude, pos.coords.longitude);
+        void trackingApi.sendPings([
+          {
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude,
+            ts: Math.floor(pos.timestamp || Date.now()),
+            speedKmh: pos.coords.speed != null ? Math.round(pos.coords.speed * 3.6) : undefined,
+            heading: pos.coords.heading != null ? Math.round(pos.coords.heading) : undefined,
+            accuracyM: pos.coords.accuracy != null ? Math.round(pos.coords.accuracy) : undefined,
+          },
+        ]).catch(() => undefined);
       },
       undefined,
       { enableHighAccuracy: true, maximumAge: 10000, timeout: 15000 },
