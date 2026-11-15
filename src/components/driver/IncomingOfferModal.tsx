@@ -26,12 +26,16 @@ export function IncomingOfferModal({ offer, onAccept, onReject, isSubmitting = f
     playAlertTone();
 
     // Calculate actual seconds remaining based on respondBy timestamp
-    const deadline = new Date(offer.respondBy).getTime();
+    const parsedDeadline = offer.respondBy ? new Date(offer.respondBy).getTime() : NaN;
+    const deadline = Number.isFinite(parsedDeadline) ? parsedDeadline : Date.now() + TOTAL_SECONDS * 1000;
+
     const updateTime = () => {
-      const remaining = Math.max(0, Math.round((deadline - Date.now()) / 1000));
-      setSecondsLeft(remaining > 0 ? Math.min(remaining, TOTAL_SECONDS) : 0);
+      const remaining = Math.round((deadline - Date.now()) / 1000);
       if (remaining <= 0) {
+        setSecondsLeft(0);
         onReject(offer.id);
+      } else {
+        setSecondsLeft(Math.min(remaining, TOTAL_SECONDS));
       }
     };
 

@@ -101,6 +101,19 @@ export default function DriverDashboard() {
     return () => clearInterval(interval);
   }, [isAvailable, activeJob, pollActiveOffer]);
 
+  // Restore active delivery on mount if driver accepted a job
+  useEffect(() => {
+    if (activeJob) return;
+    void driverApi.getActiveDelivery().then(async (accepted) => {
+      if (accepted && accepted.shipmentId) {
+        const job = await driverApi.getJobView(accepted.shipmentId).catch(() => null);
+        if (job && job.status !== 'DELIVERED') {
+          setActiveJob(job);
+        }
+      }
+    });
+  }, [activeJob]);
+
   // 4. GPS Location Ingestion (Self-report location while on shift)
   useEffect(() => {
     if (currentShift === 'OFFLINE' || !navigator.geolocation) return;

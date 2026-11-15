@@ -14,7 +14,7 @@ interface BaseMapProps {
 export function BaseMap({ center = DEFAULT_CENTER, zoom = DEFAULT_ZOOM, className, children }: BaseMapProps) {
     return (
         <MapContainer center={center} zoom={zoom} className={cn('h-full w-full', className)} scrollWheelZoom>
-            <TileLayer url={TILE_URL} attribution={TILE_ATTRIBUTION} subdomains="abcd" maxZoom={19} />
+            <TileLayer url={TILE_URL} attribution={TILE_ATTRIBUTION} subdomains="abc" maxZoom={19} />
             {children}
         </MapContainer>
     );

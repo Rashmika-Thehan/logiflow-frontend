@@ -23,8 +23,32 @@ export const driverApi = {
   /**
    * Checks for a currently active assignment offer waiting for driver response.
    */
-  getActiveOffer: (): Promise<AssignmentOffer | null> =>
-    api.get<AssignmentOffer | null>('/assignment-offers/active').then((r) => r.data),
+  getActiveOffer: async (): Promise<AssignmentOffer | null> => {
+    try {
+      const res = await api.get<AssignmentOffer | null>('/assignment-offers/pending');
+      if (res.data && res.data.id) return res.data;
+    } catch {
+      // fallback
+    }
+    try {
+      const mine = await api.get<AssignmentOffer[]>('/assignment-offers/mine');
+      return Array.isArray(mine.data) ? mine.data[0] ?? null : null;
+    } catch {
+      return null;
+    }
+  },
+
+  /**
+   * Fetches the accepted/in-progress delivery commitment for this driver.
+   */
+  getActiveDelivery: async (): Promise<AssignmentOffer | null> => {
+    try {
+      const res = await api.get<AssignmentOffer[]>('/assignment-offers/active');
+      return Array.isArray(res.data) ? res.data[0] ?? null : null;
+    } catch {
+      return null;
+    }
+  },
 
   /**
    * Responds to an incoming dispatch assignment offer (ACCEPT or REJECT).
