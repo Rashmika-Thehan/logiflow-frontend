@@ -11,6 +11,7 @@ import {
 } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/button';
 import { DeliveryOtpModal } from './DeliveryOtpModal';
+import { JobLocationsMap } from '@/components/map/JobLocationsMap';
 import { driverApi } from '@/api/driver.api';
 import { getErrorMessage } from '@/api/client';
 import type { DriverJobView } from '@/types';
@@ -18,9 +19,10 @@ import type { DriverJobView } from '@/types';
 interface Props {
   job: DriverJobView;
   onRefresh: () => void;
+  onDropped?: () => void;
 }
 
-export function ActiveJobCard({ job, onRefresh }: Props) {
+export function ActiveJobCard({ job, onRefresh, onDropped }: Props) {
   const [otpModalOpen, setOtpModalOpen] = useState(false);
   const [loadingAction, setLoadingAction] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -32,6 +34,7 @@ export function ActiveJobCard({ job, onRefresh }: Props) {
     setActionError(null);
     try {
       await actionFn();
+      if (actionName === 'drop') onDropped?.();
       onRefresh();
     } catch (err) {
       setActionError(getErrorMessage(err, `Action failed: ${actionName}`));
@@ -41,7 +44,7 @@ export function ActiveJobCard({ job, onRefresh }: Props) {
   };
 
   const openNavigation = (lat?: number, lng?: number, address?: string) => {
-    if (lat && lng) {
+    if (lat != null && lng != null) {
       window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`, '_blank');
     } else if (address) {
       window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}`, '_blank');
@@ -71,7 +74,7 @@ export function ActiveJobCard({ job, onRefresh }: Props) {
               </span>
             </div>
             <p className="caption-2 text-fg-muted mt-0.5">
-              Weight: {job.weightKg} kg • Assigned Job
+              Weight: {job.weightKg} kg · {job.lengthCm} × {job.widthCm} × {job.heightCm} cm
             </p>
           </div>
         </div>
@@ -80,6 +83,37 @@ export function ActiveJobCard({ job, onRefresh }: Props) {
           {status}
         </span>
       </div>
+
+      {job.pickupBranchSnapshot && (
+        <section className="flex flex-col gap-3 rounded-2xl border border-surface-5 bg-surface-3/50 p-4" aria-label="Pickup and delivery locations">
+          <div>
+            <p className="caption-2 font-semibold text-fg-muted uppercase tracking-wider">Pickup branch</p>
+            <p className="body-5 font-semibold text-fg mt-1">{job.pickupBranchSnapshot.name}</p>
+            <p className="caption-1 text-fg-muted">{job.pickupBranchSnapshot.address}</p>
+          </div>
+          <JobLocationsMap
+            pickup={{
+              lat: job.pickupBranchSnapshot.latitude,
+              lng: job.pickupBranchSnapshot.longitude,
+              label: `Pickup: ${job.pickupBranchSnapshot.name}`,
+            }}
+            destination={job.status === 'ASSIGNED'
+              ? job.approxDestLat != null && job.approxDestLng != null ? { lat: job.approxDestLat, lng: job.approxDestLng, label: 'Approximate delivery area' } : null
+              : job.recipientLat != null && job.recipientLng != null ? { lat: job.recipientLat, lng: job.recipientLng, label: 'Delivery destination' } : null}
+          />
+          {job.status === 'ASSIGNED' && (
+            <p className="caption-2 text-fg-muted">The delivery pin is approximate. Customer details are available after you collect the parcel.</p>
+          )}
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => openNavigation(job.pickupBranchSnapshot?.latitude, job.pickupBranchSnapshot?.longitude, job.pickupBranchSnapshot?.address)}
+            className="w-full gap-2"
+          >
+            <NavigationArrow size={16} /> Navigate to pickup branch
+          </Button>
+        </section>
+      )}
 
       {actionError && (
         <div className="flex items-center gap-2 rounded-xl border border-status-urgent/40 bg-status-urgent/10 p-3 text-xs text-status-urgent">
@@ -156,7 +190,7 @@ export function ActiveJobCard({ job, onRefresh }: Props) {
             <span>Step 2: Start Customer Transit</span>
           </div>
           <p className="caption-2 text-fg-muted">
-            Package is on board. Tap below to begin transit. This will notify the recipient and reveal full delivery dropoff details.
+            Package is on board. Tap below to begin transit and start the customer delivery route.
           </p>
 
           <Button
@@ -172,9 +206,9 @@ export function ActiveJobCard({ job, onRefresh }: Props) {
       )}
 
       {/* Phase D: Out for Delivery (IN_TRANSIT) */}
-      {status === 'IN_TRANSIT' && (
+      {(status === 'PICKED_UP' || status === 'IN_TRANSIT') && (
         <div className="flex flex-col gap-4">
-          {/* Recipient Details (Released upon transit start) */}
+          {/* Recipient details are released once collection is confirmed. */}
           <div className="flex flex-col gap-3 rounded-2xl border border-surface-5 bg-surface-3/50 p-4">
             <span className="caption-2 font-semibold text-fg-muted uppercase tracking-wider">
               Customer Destination
@@ -205,7 +239,7 @@ export function ActiveJobCard({ job, onRefresh }: Props) {
               variant="secondary"
               size="sm"
               onClick={() =>
-                openNavigation(job.approxDestLat, job.approxDestLng, job.recipientAddress)
+                openNavigation(job.recipientLat ?? job.approxDestLat, job.recipientLng ?? job.approxDestLng, job.recipientAddress)
               }
               className="w-full gap-2 mt-1"
             >

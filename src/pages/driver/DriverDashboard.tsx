@@ -380,7 +380,7 @@ export default function DriverDashboard() {
 
         {/* Active Job View (if currently delivering) */}
         {activeJob ? (
-          <ActiveJobCard job={activeJob} onRefresh={refreshJob} />
+          <ActiveJobCard job={activeJob} onRefresh={refreshJob} onDropped={() => setActiveJob(null)} />
         ) : (
           /* Idle Views based on shift status */
           <div className="flex flex-col gap-4">

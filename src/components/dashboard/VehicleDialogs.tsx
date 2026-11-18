@@ -26,7 +26,7 @@ const futureDate = z.string().refine((v) => !v || v >= todayIso(), 'This insuran
 /* Add vehicle */
 const addSchema = z.object({
     licensePlate: z.string().trim().min(3, 'Enter the licence plate.'),
-    vehicleClass: z.enum(['MOTORCYCLE', 'SEDAN', 'VAN', 'TRUCK']),
+    vehicleClass: z.enum(['MOTORCYCLE', 'THREE-WHEEL', 'CAR', 'VAN', 'TRUCK']),
     maxWeightKg: z.number({ message: 'Enter the maximum load in kg.' }).positive('Enter the maximum load in kg.'),
     volumeM3: z.number({ message: 'Enter the cargo volume in m³.' }).positive('Enter the cargo volume in m³.'),
     insuranceExpiry: futureDate,

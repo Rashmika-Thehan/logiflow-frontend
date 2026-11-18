@@ -71,14 +71,16 @@ export default function Dispatch() {
             return copy;
         });
 
-    const hasCoords = selected?.recipientLat !== undefined && selected?.recipientLng !== undefined;
+    const pickupLat = selected?.pickupBranchSnapshot?.latitude ?? selected?.recipientLat;
+    const pickupLng = selected?.pickupBranchSnapshot?.longitude ?? selected?.recipientLng;
+    const hasCoords = pickupLat !== undefined && pickupLng !== undefined;
     const candidates = useQuery({
         queryKey: ['candidates', selected?.id],
         queryFn: () =>
             assignmentsApi.candidates({
                 weightKg: selected!.weightKg,
-                lat: selected!.recipientLat as number,
-                lng: selected!.recipientLng as number,
+                lat: pickupLat as number,
+                lng: pickupLng as number,
             }),
         enabled: !!selected && hasCoords,
         refetchInterval: 15_000,
@@ -194,6 +196,9 @@ export default function Dispatch() {
                         <>
                             <div className="rounded-2xl border border-surface-5 bg-surface-2 p-4">
                                 <p className="body-4">{selected.trackingCode}</p>
+                                {selected.pickupBranchSnapshot && (
+                                    <p className="caption-1 text-fg-muted">Pickup: {selected.pickupBranchSnapshot.name} · {selected.pickupBranchSnapshot.address}</p>
+                                )}
                                 <p className="body-6">{selected.recipientAddress}</p>
                                 <p className="caption-2 text-fg-muted">
                                     {selected.weightKg} kg, {selected.lengthCm} x {selected.widthCm} x {selected.heightCm} cm. Window:{' '}
@@ -203,7 +208,7 @@ export default function Dispatch() {
 
                             {!hasCoords ? (
                                 <p role="alert" className="body-6 text-status-urgent">
-                                    This shipment has no coordinates, so drivers cannot be ranked. Edit the shipment or recreate it with a location.
+                                    This shipment has no pickup coordinates, so drivers cannot be ranked. Configure its pickup branch location.
                                 </p>
                             ) : candidates.isPending ? (
                                 <div className="flex flex-col gap-2" aria-busy="true" aria-label="Loading candidates">

@@ -1,4 +1,6 @@
 import { Check, Package, Truck, CheckCircle, Clock } from '@phosphor-icons/react';
+import { statusDescription, statusLabel } from '@/lib/shipment';
+import type { ShipmentStatus } from '@/types';
 
 interface Props {
   status: string;
@@ -70,11 +72,7 @@ export function TrackingStepper({ status }: Props) {
           <h4 className="body-5 font-semibold">
             {isCancelled ? 'Shipment Cancelled' : 'Delivery Attempt Failed'}
           </h4>
-          <p className="caption-2 mt-0.5">
-            {isCancelled
-              ? 'This parcel dispatch was cancelled by the merchant.'
-              : 'The courier was unable to complete the dropoff. Please contact support.'}
-          </p>
+          <p className="caption-2 mt-0.5">{statusDescription(status as 'CANCELLED' | 'FAILED')}</p>
         </div>
       </div>
     );
@@ -82,6 +80,12 @@ export function TrackingStepper({ status }: Props) {
 
   return (
     <div className="flex flex-col gap-4">
+      {statusDescription(status as ShipmentStatus) && (
+        <p className="caption-1 text-fg-muted" role="status">
+          <span className="font-semibold text-fg">{statusLabel(status as ShipmentStatus)}:</span>{' '}
+          {statusDescription(status as ShipmentStatus)}
+        </p>
+      )}
       <div className="relative flex items-center justify-between">
         {/* Progress connecting line */}
         <div className="absolute left-6 right-6 top-5 -z-0 h-0.5 bg-surface-4">

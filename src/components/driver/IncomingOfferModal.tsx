@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Package, Clock, Check, X } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/button';
+import { JobLocationsMap } from '@/components/map/JobLocationsMap';
 import { playAlertTone } from '@/lib/audio';
 import type { AssignmentOffer } from '@/types';
 
@@ -118,6 +119,31 @@ export function IncomingOfferModal({ offer, onAccept, onReject, isSubmitting = f
                 </span>
               </div>
             </div>
+            {offer.preview?.pickupBranch && (
+              <div className="border-t border-surface-4 pt-3">
+                <p className="caption-2 font-semibold text-fg">Pickup: {offer.preview.pickupBranch.name}</p>
+                <p className="caption-2 text-fg-muted">{offer.preview.pickupBranch.address}</p>
+                {offer.preview.approxDestLat != null && offer.preview.approxDestLng != null && (
+                  <p className="caption-2 text-fg-muted mt-2">Delivery area is approximate; recipient details are hidden until pickup.</p>
+                )}
+                <JobLocationsMap
+                  className="mt-3"
+                  pickup={{
+                    lat: offer.preview.pickupBranch.latitude,
+                    lng: offer.preview.pickupBranch.longitude,
+                    label: `Pickup: ${offer.preview.pickupBranch.name}`,
+                  }}
+                  destination={offer.preview.approxDestLat != null && offer.preview.approxDestLng != null ? {
+                    lat: offer.preview.approxDestLat,
+                    lng: offer.preview.approxDestLng,
+                    label: 'Approximate delivery area',
+                  } : null}
+                />
+                <div className="mt-2 flex justify-between caption-2 text-fg-muted">
+                  <span>P · Pickup</span><span>D · Approximate delivery area</span>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Action Buttons */}

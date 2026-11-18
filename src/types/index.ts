@@ -3,7 +3,7 @@ export type ShipmentStatus =
   'PENDING' | 'DISPATCHING' | 'ASSIGNED' | 'PICKED_UP' | 'IN_TRANSIT' | 'DELIVERED' | 'CANCELLED' | 'FAILED';
 export type PriorityTier = 'STANDARD' | 'EXPRESS' | 'URGENT';
 export type ShiftStatus = 'OFFLINE' | 'AVAILABLE' | 'ON_BREAK' | 'BUSY';
-export type VehicleClass = 'MOTORCYCLE' | 'SEDAN' | 'VAN' | 'TRUCK';
+export type VehicleClass = 'MOTORCYCLE' | 'THREE-WHEEL' | 'CAR' | 'VAN' | 'TRUCK';
 
 export interface UserContext {
   userId: string;
@@ -23,6 +23,8 @@ export interface Shipment {
   recipientEmail?: string;
   recipientLat?: number;
   recipientLng?: number;
+  pickupBranchId?: string | null;
+  pickupBranchSnapshot?: PickupBranchSnapshot | null;
   weightKg: number;
   lengthCm: number;
   widthCm: number;
@@ -43,14 +45,29 @@ export interface DriverJobView extends Omit<Shipment, 'recipientName' | 'recipie
   recipientDetailsReleased: boolean;
 }
 
+export interface PickupBranchSnapshot {
+  id: string;
+  name: string;
+  address: string;
+  latitude: number;
+  longitude: number;
+}
+
 export interface AssignmentOffer {
   id: string;
   tenantId: string;
   driverId: string;
   shipmentId: string;
-  status: 'PENDING_ACCEPTANCE' | 'ACCEPTED' | 'REJECTED' | 'EXPIRED' | 'COMPLETED';
+  status: 'PENDING_ACCEPTANCE' | 'ACCEPTED' | 'REJECTED' | 'EXPIRED' | 'COMPLETED' | 'CANCELLED';
   respondBy: string;
-  preview?: { weightKg: number; priority: PriorityTier; approxDistanceKm?: number };
+  preview?: {
+    weightKg: number;
+    priority: PriorityTier;
+    approxDistanceKm?: number;
+    pickupBranch?: PickupBranchSnapshot;
+    approxDestLat?: number | null;
+    approxDestLng?: number | null;
+  };
 }
 
 export interface Vehicle {
@@ -119,9 +136,10 @@ export interface Branch {
   tenantId: string;
   name: string;
   address: string;
-  latitude: number;
-  longitude: number;
+  latitude: number | null;
+  longitude: number | null;
   phone?: string | null;
+  isDefault: boolean;
   createdAt: string;
   updatedAt: string;
 }

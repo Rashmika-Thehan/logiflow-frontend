@@ -44,13 +44,19 @@ export function BranchesTab() {
     onError: (err) => setErrorMsg(getErrorMessage(err, 'Failed to delete branch.')),
   });
 
+  const defaultMutation = useMutation({
+    mutationFn: (id: string) => branchesApi.setDefault(id),
+    onSuccess: () => void invalidate(),
+    onError: (err) => setErrorMsg(getErrorMessage(err, 'Failed to set the default pickup branch.')),
+  });
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="heading-5">Depot Branches</h2>
           <p className="body-6 text-fg-muted">
-            Configure hubs and sorting facilities where drivers collect packages.
+            Configure pickup hubs. Batch imports use the branch marked as the default.
           </p>
         </div>
         <Button onClick={() => setCreateOpen(true)} className="gap-2">
@@ -98,7 +104,10 @@ export function BranchesTab() {
                     <MapPin size={22} aria-hidden="true" />
                   </div>
                   <div>
-                    <h3 className="title-2">{b.name}</h3>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h3 className="title-2">{b.name}</h3>
+                      {b.isDefault && <span className="rounded-full bg-status-available/10 px-2 py-0.5 caption-2 text-status-available">Default for imports</span>}
+                    </div>
                     <p className="body-6 text-fg-muted">{b.address}</p>
                   </div>
                 </div>
@@ -114,8 +123,10 @@ export function BranchesTab() {
                   <button
                     type="button"
                     onClick={() => setDeletingBranch(b)}
+                    disabled={b.isDefault}
+                    title={b.isDefault ? 'Select another default before deleting this branch' : `Delete ${b.name}`}
                     aria-label={`Delete ${b.name}`}
-                    className="rounded-lg p-2 text-fg-muted transition-colors hover:bg-surface-4 hover:text-status-urgent"
+                    className="rounded-lg p-2 text-fg-muted transition-colors hover:bg-surface-4 hover:text-status-urgent disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     <Trash size={18} />
                   </button>
@@ -123,8 +134,13 @@ export function BranchesTab() {
               </div>
 
               <div className="flex flex-wrap items-center gap-3 border-t border-surface-5 pt-3 caption-1 text-fg-muted">
-                <span>Coordinates: {b.latitude.toFixed(4)}, {b.longitude.toFixed(4)}</span>
+                <span>Coordinates: {b.latitude != null && b.longitude != null ? `${b.latitude.toFixed(4)}, ${b.longitude.toFixed(4)}` : 'Missing — update before selecting as a pickup branch'}</span>
                 {b.phone && <span>• Phone: {b.phone}</span>}
+                {!b.isDefault && (
+                  <Button size="sm" variant="secondary" disabled={defaultMutation.isPending || b.latitude == null || b.longitude == null} onClick={() => defaultMutation.mutate(b.id)}>
+                    Set as import default
+                  </Button>
+                )}
               </div>
             </div>
           ))}
@@ -207,8 +223,8 @@ function BranchFormModal({
       ? {
           name: initialData.name,
           address: initialData.address,
-          latitude: initialData.latitude,
-          longitude: initialData.longitude,
+          latitude: initialData.latitude ?? undefined,
+          longitude: initialData.longitude ?? undefined,
           phone: initialData.phone || '',
         }
       : undefined,
