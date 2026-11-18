@@ -1,7 +1,6 @@
 import type { VehicleClass } from '@/types';
 
-// Spec lists these four. The Postman collection also uses SPRINTER_VAN, so confirm the backend enum.
-export const VEHICLE_CLASSES: VehicleClass[] = ['MOTORCYCLE', 'SEDAN', 'VAN', 'TRUCK'];
+export const VEHICLE_CLASSES: VehicleClass[] = ['MOTORCYCLE', 'THREE-WHEEL', 'CAR', 'VAN', 'TRUCK'];
 
 export const vehicleClassLabel = (value: string) => {
     const text = value.toLowerCase().replace(/_/g, ' ');

@@ -10,6 +10,7 @@ interface AlertsState {
     setAlerts: (list: AlertNotification[]) => void;
     add: (alert: AlertNotification) => void;
     markAcknowledged: (id: string) => void;
+    markAllAcknowledged: () => void;
 }
 
 export const useAlertsStore = create<AlertsState>((set) => ({
@@ -20,6 +21,12 @@ export const useAlertsStore = create<AlertsState>((set) => ({
         set((s) => ({
             alerts: s.alerts.map((a) => (a.id === id ? { ...a, acknowledgedAt: new Date().toISOString() } : a)),
         })),
+    markAllAcknowledged: () => {
+        const acknowledgedAt = new Date().toISOString();
+        set((s) => ({
+            alerts: s.alerts.map((a) => a.acknowledgedAt ? a : { ...a, acknowledgedAt }),
+        }));
+    },
 }));
 
 export const selectUnreadCount = (s: AlertsState) => s.alerts.reduce((n, a) => (a.acknowledgedAt ? n : n + 1), 0);

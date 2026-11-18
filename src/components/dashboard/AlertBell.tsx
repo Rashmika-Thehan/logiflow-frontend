@@ -16,6 +16,9 @@ const dot: Record<AlertNotification['severity'], string> = {
 
 export function AlertBell() {
     const [open, setOpen] = useState(false);
+    const [acknowledgingId, setAcknowledgingId] = useState<string | null>(null);
+    const [markingAll, setMarkingAll] = useState(false);
+    const [actionError, setActionError] = useState('');
     const wrapper = useRef<HTMLDivElement>(null);
     const alerts = useAlertsStore((s) => s.alerts);
     const unread = useAlertsStore(selectUnreadCount);
@@ -36,12 +39,30 @@ export function AlertBell() {
     }, [open]);
 
     const acknowledge = async (id: string) => {
+        setAcknowledgingId(id);
+        setActionError('');
         useAlertsStore.getState().markAcknowledged(id);
         try {
             await alertsApi.acknowledge(id);
         } catch {
-            // Put the real state back if the server refused.
             useAlertsStore.getState().setAlerts(await alertsApi.list(false).catch(() => alerts));
+            setActionError('Could not mark this alert as read. Please try again.');
+        } finally {
+            setAcknowledgingId(null);
+        }
+    };
+
+    const acknowledgeAll = async () => {
+        setMarkingAll(true);
+        setActionError('');
+        useAlertsStore.getState().markAllAcknowledged();
+        try {
+            await alertsApi.acknowledgeAll();
+        } catch {
+            useAlertsStore.getState().setAlerts(await alertsApi.list(false).catch(() => alerts));
+            setActionError('Could not mark all alerts as read. Please try again.');
+        } finally {
+            setMarkingAll(false);
         }
     };
 
@@ -73,6 +94,19 @@ export function AlertBell() {
                         exit={{ opacity: 0, y: 8 }}
                         transition={{ duration: 0.3, ease: EASE_BRAND }}
                     >
+                        {actionError && <p role="alert" className="rounded-lg bg-status-urgent/10 p-2 caption-2 text-status-urgent">{actionError}</p>}
+                        {active.length > 0 && (
+                            <div className="flex justify-end px-1">
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    disabled={markingAll || acknowledgingId !== null}
+                                    onClick={() => void acknowledgeAll()}
+                                >
+                                    {markingAll ? 'Marking all…' : 'Mark all as read'}
+                                </Button>
+                            </div>
+                        )}
                         {active.length === 0 ? (
                             <p className="body-6 p-3 text-fg-muted">No active alerts. New alerts appear here as they happen.</p>
                         ) : (
@@ -88,8 +122,14 @@ export function AlertBell() {
                                             </p>
                                         </div>
                                     </div>
-                                    <Button variant="secondary" size="sm" className="w-fit" onClick={() => void acknowledge(a.id)}>
-                                        Acknowledge
+                                    <Button
+                                        variant="secondary"
+                                        size="sm"
+                                        className="w-fit"
+                                        disabled={markingAll || acknowledgingId !== null}
+                                        onClick={() => void acknowledge(a.id)}
+                                    >
+                                        {acknowledgingId === a.id ? 'Marking read…' : 'Mark as read'}
                                     </Button>
                                 </article>
                             ))

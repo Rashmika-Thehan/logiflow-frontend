@@ -26,10 +26,12 @@ export interface DispatchSettingsInput {
 
 export const branchesApi = {
     list: () => api.get<Branch[]>('/branches').then((res) => res.data),
+    getDefault: () => api.get<Branch>('/branches/default').then((res) => res.data),
     create: (input: CreateBranchInput) => api.post<Branch>('/branches', input).then((res) => res.data),
     update: (id: string, input: Partial<CreateBranchInput>) =>
         api.patch<Branch>(`/branches/${id}`, input).then((res) => res.data),
     remove: (id: string) => api.delete(`/branches/${id}`).then((res) => res.data),
+    setDefault: (id: string) => api.patch<Branch>(`/branches/${id}/default`).then((res) => res.data),
 };
 
 export const invitationsApi = {

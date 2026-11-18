@@ -16,6 +16,7 @@ export interface ListShipmentsParams {
 }
 
 export interface CreateShipmentInput {
+  pickupBranchId: string;
   recipientName: string;
   recipientPhone: string;
   recipientEmail?: string;

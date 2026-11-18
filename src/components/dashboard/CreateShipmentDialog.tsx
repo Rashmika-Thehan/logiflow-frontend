@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -10,11 +10,13 @@ import { Field } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Modal } from '@/components/ui/modal';
 import { AddressSearch } from '@/components/dashboard/AddressSearch';
+import { branchesApi } from '@/api/org.api';
 
 const positive = (label: string) => z.number({ message: `Enter the ${label}.` }).positive(`Enter the ${label}.`);
 
 const schema = z
     .object({
+        pickupBranchId: z.string().min(1, 'Select a pickup branch.'),
         recipientName: z.string().trim().min(2, 'Enter the recipient name.'),
         recipientPhone: z.string().regex(/^\+?[0-9 ]{7,15}$/, 'Enter a phone number with country code.'),
         recipientEmail: z.string().email('Enter a valid email address.').or(z.literal('')),
@@ -45,6 +47,7 @@ interface Props {
 
 export function CreateShipmentDialog({ open, onClose, onCreated }: Props) {
     const [formError, setFormError] = useState('');
+    const branches = useQuery({ queryKey: ['branches'], queryFn: branchesApi.list, enabled: open });
     const {
         register,
         handleSubmit,
@@ -56,7 +59,7 @@ export function CreateShipmentDialog({ open, onClose, onCreated }: Props) {
 
     useEffect(() => {
         if (open) {
-            reset({ priority: 'STANDARD' });
+            reset({ priority: 'STANDARD', pickupBranchId: '' });
             setFormError('');
         }
     }, [open, reset]);
@@ -86,6 +89,24 @@ export function CreateShipmentDialog({ open, onClose, onCreated }: Props) {
     return (
         <Modal open={open} onClose={onClose} title="Create shipment">
             <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-4">
+                <Field id="pickupBranchId" label="Pickup branch" error={errors.pickupBranchId?.message}>
+                    <select id="pickupBranchId" className="body-5 w-full rounded-lg border border-surface-5 bg-surface-3 px-3 py-2" {...register('pickupBranchId')}>
+                        <option value="">Select a warehouse or branch</option>
+                        {(branches.data ?? []).map((branch) => (
+                            <option
+                                key={branch.id}
+                                value={branch.id}
+                                disabled={branch.latitude == null || branch.longitude == null}
+                            >
+                                {branch.name} — {branch.address}{branch.latitude == null || branch.longitude == null ? ' (add map coordinates in Settings)' : ''}
+                            </option>
+                        ))}
+                    </select>
+                    {branches.isError && <p role="alert" className="caption-2 text-status-urgent">Could not load branches. Try again or check Settings.</p>}
+                    {!branches.isPending && !branches.isError && branches.data?.length === 0 && (
+                        <p className="caption-2 text-fg-muted">Add a branch with map coordinates in Settings before creating a shipment.</p>
+                    )}
+                </Field>
                 <Field id="recipientName" label="Recipient name" error={errors.recipientName?.message}>
                     <Input id="recipientName" autoComplete="off" {...register('recipientName')} />
                 </Field>
@@ -93,7 +114,7 @@ export function CreateShipmentDialog({ open, onClose, onCreated }: Props) {
                     <Field id="recipientPhone" label="Recipient phone" error={errors.recipientPhone?.message}>
                         <Input id="recipientPhone" type="tel" autoComplete="off" {...register('recipientPhone')} />
                     </Field>
-                    <Field id="recipientEmail" label="Recipient email (for the delivery code)" error={errors.recipientEmail?.message}>
+                    <Field id="recipientEmail" label="Recipient email" error={errors.recipientEmail?.message}>
                         <Input id="recipientEmail" type="email" autoComplete="off" {...register('recipientEmail')} />
                     </Field>
                 </div>

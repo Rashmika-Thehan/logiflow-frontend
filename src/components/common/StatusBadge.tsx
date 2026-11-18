@@ -1,4 +1,4 @@
-import { statusLabel } from '@/lib/shipment';
+import { statusDescription, statusLabel } from '@/lib/shipment';
 import type { PriorityTier, ShipmentStatus } from '@/types';
 
 const statusDot: Record<ShipmentStatus, string> = {
@@ -16,7 +16,7 @@ export function StatusBadge({ status }: { status: ShipmentStatus }) {
     const label = statusLabel(status);
     const dot = statusDot[status];
     return (
-        <span className="caption-1 inline-flex items-center gap-2 rounded-lg border border-surface-5 bg-surface-3 px-2 py-1">
+        <span title={statusDescription(status)} aria-label={`${label}: ${statusDescription(status)}`} className="caption-1 inline-flex items-center gap-2 rounded-lg border border-surface-5 bg-surface-3 px-2 py-1">
             <span className={`h-2 w-2 rounded-full ${dot}`} aria-hidden="true" />
             {label}
         </span>
