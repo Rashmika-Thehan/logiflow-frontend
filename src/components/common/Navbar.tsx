@@ -41,24 +41,24 @@ export function Navbar() {
     <header className="fixed inset-x-0 top-3 z-50 flex justify-center px-4">
       <nav
         aria-label="Main"
-        className="flex w-full max-w-4xl items-center justify-between gap-4 rounded-2xl border border-surface-5 bg-surface-2/70 p-2 backdrop-blur-md"
+        className="flex w-full max-w-6xl items-center justify-between gap-2 rounded-2xl border border-surface-5 bg-surface-2/70 p-2 backdrop-blur-md"
       >
         <Link
           to="/"
-          className="rounded-lg px-2 py-1"
+          className="shrink-0 rounded-lg px-2 py-1"
           aria-label="LogiFlow home"
           aria-current={pathname === '/' ? 'page' : undefined}
         >
           <Logo />
         </Link>
 
-        <ul className="hidden items-center gap-1 md:flex">
+        <ul className="hidden shrink-0 items-center gap-5 lg:flex">
           {navLinks.map((link) => (
             <li key={link.label}>
               {link.href.startsWith('/#') ? (
                 <a
                   href={link.href}
-                  className="body-5 rounded-lg px-3 py-2 text-fg-muted transition-colors duration-300 ease-brand hover:text-fg"
+                  className="body-5 whitespace-nowrap rounded-lg px-2 py-2 text-fg-muted transition-colors duration-300 ease-brand hover:text-fg"
                 >
                   {link.label}
                 </a>
@@ -66,7 +66,7 @@ export function Navbar() {
                 <NavLink
                   to={link.href}
                   className={({ isActive }) =>
-                    `body-5 rounded-lg px-3 py-2 transition-colors duration-300 ease-brand hover:text-fg ${isActive ? 'bg-surface-4 text-fg' : 'text-fg-muted'}`
+                    `body-5 whitespace-nowrap rounded-lg px-2 py-2 transition-colors duration-300 ease-brand hover:text-fg ${isActive ? 'bg-surface-4 text-fg' : 'text-fg-muted'}`
                   }
                 >
                   {link.label}
@@ -76,16 +76,16 @@ export function Navbar() {
           ))}
         </ul>
 
-        <div className="flex items-center gap-1">
-          <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
+        <div className="flex shrink-0 items-center gap-1">
+          <Button asChild variant="ghost" size="sm" className="hidden whitespace-nowrap sm:inline-flex">
             <Link to="/login">Sign in</Link>
           </Button>
           <Button asChild size="sm">
-            <Link to="/register">Get started</Link>
+            <Link to="/register" className="whitespace-nowrap">Get started</Link>
           </Button>
           <button
             type="button"
-            className="rounded-lg p-2 md:hidden"
+            className="rounded-lg p-2 lg:hidden"
             aria-expanded={open}
             aria-controls="mobile-menu"
             aria-label={open ? 'Close menu' : 'Open menu'}
@@ -99,7 +99,7 @@ export function Navbar() {
       {open && (
         <motion.div
           id="mobile-menu"
-          className="fixed inset-0 -z-10 flex flex-col gap-2 bg-surface-0/95 px-4 pt-24 backdrop-blur-xl md:hidden"
+          className="fixed inset-0 -z-10 flex flex-col gap-2 bg-surface-0/95 px-4 pt-24 backdrop-blur-xl lg:hidden"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, ease: EASE_BRAND }}

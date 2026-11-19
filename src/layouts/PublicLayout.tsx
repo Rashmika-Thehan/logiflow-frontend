@@ -25,6 +25,11 @@ export function PublicLayout() {
               </Link>
             </li>
             <li>
+              <Link to="/docs" className="hover:text-fg">
+                Documentation
+              </Link>
+            </li>
+            <li>
               <Link to="/driver/login" className="hover:text-fg">
                 Driver portal
               </Link>

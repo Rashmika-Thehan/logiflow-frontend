@@ -6,6 +6,7 @@ export const navLinks = [
   { label: 'How it works', href: '/#how-it-works' },
   { label: 'FAQ', href: '/#faq' },
   { label: 'Track a parcel', href: '/track' },
+  { label: 'Docs', href: '/docs' },
   { label: 'Driver Portal', href: '/driver/login' },
 ];
 
@@ -13,6 +14,7 @@ export const stats = [
   { value: '45s', label: 'Average matching time' }, // SPEC
   { value: '99.98%', label: 'On time deliveries' }, // SPEC
   { value: '1.2M+', label: 'GPS pings processed per day' }, // SPEC
+  { value: '99.9%', label: 'Accurate parcel tracking'}
 ];
 
 export const benefits = [
@@ -55,9 +57,6 @@ export const tagline = [
   'Every driver knows the next stop.',
   'Every recipient knows when to open the door.',
 ].join(' ');
-
-// No real testimonial supplied yet, so this stays a marked placeholder (SKILL B8).
-export const testimonial = { quote: '{{testimonial}}', name: '{{customer name}}', role: '{{role and company}}' };
 
 export const faqs = [
   {

@@ -4,7 +4,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Link, useNavigate } from 'react-router-dom';
 import {
-  SteeringWheel,
   CheckCircle,
   Buildings,
   Sparkle,
@@ -19,6 +18,7 @@ import { Field } from '@/components/ui/field';
 import { PasswordMeter } from '@/components/auth/PasswordMeter';
 import { isStrongPassword } from '@/lib/password';
 import driverLoginImage from '@/assets/driver-login.png';
+import logiflowFavicon from '@/assets/logiflow-favicon.png';
 
 const driverApplySchema = z.object({
   mode: z.enum(['org', 'platform']),
@@ -131,8 +131,8 @@ export default function DriverApply() {
       <div className="relative z-20 mx-auto w-full max-w-md flex-1 flex flex-col justify-center">
         {/* Header */}
         <div className="text-center mb-6">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-fg text-surface-0 shadow-lg shadow-fg/10 mb-4">
-            <SteeringWheel size={30} weight="duotone" />
+          <div className="mx-auto mb-4 h-14 w-14 overflow-hidden rounded-2xl shadow-lg shadow-fg/10">
+            <img src={logiflowFavicon} alt="LogiFlow" className="h-full w-full object-cover" />
           </div>
           <h1 className="heading-4 font-bold text-fg">Apply to Drive</h1>
           <p className="body-6 text-fg-muted mt-1.5">

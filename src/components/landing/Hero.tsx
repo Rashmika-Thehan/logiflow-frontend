@@ -64,14 +64,14 @@ export function Hero() {
           </p>
           <div className="hero-elem flex flex-wrap items-center gap-3">
             <Button asChild size="lg">
-              <Link to="/register">Start free trial</Link>
+              <Link to="/register">Join LogiFlow</Link>
             </Button>
             <Button asChild variant="secondary" size="lg" className="gap-2">
               <Link to="/driver/apply">
                 Drive with us
               </Link>
             </Button>
-            <p className="caption-2 text-fg-muted w-full sm:w-auto">14 day trial for logistics teams • Instant driver signup</p>
+            <p className="caption-2 text-fg-muted w-full sm:w-auto">logistics teams • Instant driver signup</p>
           </div>
           <form onSubmit={onTrack} noValidate className="hero-elem flex max-w-md flex-col gap-2 pt-2">
             <label htmlFor="hero-track" className="caption-1 text-fg-muted">
