@@ -203,7 +203,7 @@ export function ApiKeysTab() {
         <div className="flex flex-col gap-4">
           <p className="body-5">
             Are you sure you want to revoke <strong className="text-fg">{revokingKey?.name}</strong>?
-            Any external servers or integrations authenticating with this key will immediately be rejected.
+            New token exchanges with this key will be rejected. Access tokens already issued remain valid for up to one hour.
           </p>
           <div className="flex justify-end gap-2 pt-2">
             <Button variant="ghost" onClick={() => setRevokingKey(null)}>
@@ -307,7 +307,7 @@ function CreateKeyModal({
               <input type="checkbox" className="rounded border-surface-5" {...register('writeScope')} />
               <div>
                 <p className="caption-1 font-medium">shipments:write</p>
-                <p className="caption-2 text-fg-muted">Create parcels and batch import deliveries.</p>
+                <p className="caption-2 text-fg-muted">Create parcels and look up pickup depots.</p>
               </div>
             </label>
           </div>

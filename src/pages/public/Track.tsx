@@ -85,9 +85,9 @@ export default function Track() {
   };
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-5xl px-4 pb-8 pt-32 sm:px-6 sm:pt-36 lg:px-8">
       {/* Search Header Banner */}
-      <div className="flex flex-col gap-6 text-center">
+      <div className="flex flex-col gap-6 text-center items-center">
         <div>
           <h1 className="heading-3">Real-time Parcel Tracking</h1>
           <p className="body-5 text-fg-muted mt-2">
@@ -136,7 +136,7 @@ export default function Track() {
       </div>
 
       {/* Main Content Area */}
-      <div className="mt-8">
+      <div className="mt-8 mb-2">
         {/* State 1: No tracking code entered */}
         {!urlCode && (
           <div className="mx-auto max-w-md rounded-2xl border border-surface-5 bg-surface-2 p-8 text-center shadow-sm">
