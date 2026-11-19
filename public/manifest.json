@@ -1,6 +1,6 @@
 {
   "name": "LogiFlow Driver",
-  "short_name": "Driver",
+  "short_name": "LogiFlow",
   "description": "LogiFlow courier shift dispatch and package delivery companion",
   "start_url": "/driver",
   "display": "standalone",

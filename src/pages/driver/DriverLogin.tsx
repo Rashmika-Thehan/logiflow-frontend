@@ -9,6 +9,7 @@ import { getErrorMessage } from '@/api/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { homePathForRole, useAuthStore } from '@/stores/authStore';
+import driverLoginImage from '@/assets/driver-login.png';
 
 const schema = z.object({
   email: z.string().min(1, 'Enter your email address.').email('Enter a valid email address.'),
@@ -40,8 +41,15 @@ export default function DriverLogin() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col justify-between bg-surface-0 px-4 py-8 sm:px-6">
-      <div className="mx-auto w-full max-w-sm flex-1 flex flex-col justify-center">
+    <div className="relative isolate flex min-h-screen flex-col justify-between px-4 py-8 sm:px-6">
+      <img
+        src={driverLoginImage}
+        alt=""
+        aria-hidden="true"
+        className="absolute inset-0 z-0 h-full w-full object-cover object-[65%_50%]"
+      />
+      <div className="absolute inset-0 z-10 bg-black/55" />
+      <div className="relative z-20 mx-auto w-full max-w-sm flex-1 flex flex-col justify-center">
         {/* Header Branding */}
         <div className="text-center mb-8">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-fg text-surface-0 shadow-lg shadow-fg/10 mb-4">

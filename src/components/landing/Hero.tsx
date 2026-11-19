@@ -1,10 +1,11 @@
 import gsap from 'gsap';
 import { useLayoutEffect, useRef, useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { MagnifyingGlass, SteeringWheel } from '@phosphor-icons/react';
+import { MagnifyingGlass } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { DispatchPreview } from './DispatchPreview';
+import heroVideo from '@/assets/LogiFlow_background_video_looping_60853fe1_1080p.mp4';
 
 const CODE = /^LF-[A-Z0-9]+$/i;
 
@@ -33,8 +34,21 @@ export function Hero() {
   };
 
   return (
-    <section ref={root} className="px-4 pb-24 pt-32">
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-12">
+    <section ref={root} className="relative isolate overflow-hidden px-4 pb-24 pt-32">
+      <video
+        aria-hidden="true"
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="metadata"
+        className="absolute inset-0 hidden h-full w-full object-cover md:block"
+      >
+        <source src={heroVideo} type="video/mp4" />
+      </video>
+      <div className="absolute inset-0 bg-black/88" />
+      <div className="absolute inset-0 bg-linear-to-b from-black/20 via-black/10 to-black/80" />
+      <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-12">
         <div className="flex flex-col gap-6">
           <h1
             className="hero-elem heading-1 max-w-[680px] bg-clip-text text-transparent"
@@ -54,7 +68,6 @@ export function Hero() {
             </Button>
             <Button asChild variant="secondary" size="lg" className="gap-2">
               <Link to="/driver/apply">
-                <SteeringWheel size={18} />
                 Drive with us
               </Link>
             </Button>
