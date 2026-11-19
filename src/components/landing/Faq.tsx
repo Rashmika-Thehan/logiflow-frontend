@@ -17,7 +17,12 @@ export function Faq() {
           {faqs.map((f, i) => {
             const isOpen = open === i;
             return (
-              <div key={f.q} className="rounded-2xl border border-surface-5 bg-surface-2">
+              <div
+                key={f.q}
+                className="rounded-2xl border border-surface-5 bg-surface-2"
+                onMouseEnter={() => setOpen(i)}
+                onMouseLeave={() => setOpen((current) => (current === i ? null : current))}
+              >
                 <h3>
                   <button
                     type="button"
@@ -38,10 +43,11 @@ export function Faq() {
                   {isOpen && (
                     <motion.div
                       id={`faq-${i}`}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.3, ease: EASE_BRAND }}
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.35, ease: EASE_BRAND }}
+                      className="overflow-hidden"
                     >
                       <p className="body-3 px-4 pb-4 text-fg-muted">{f.a}</p>
                     </motion.div>

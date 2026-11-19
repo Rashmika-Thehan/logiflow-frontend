@@ -18,6 +18,7 @@ import { Input } from '@/components/ui/input';
 import { Field } from '@/components/ui/field';
 import { PasswordMeter } from '@/components/auth/PasswordMeter';
 import { isStrongPassword } from '@/lib/password';
+import driverLoginImage from '@/assets/driver-login.png';
 
 const driverApplySchema = z.object({
   mode: z.enum(['org', 'platform']),
@@ -119,8 +120,15 @@ export default function DriverApply() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col justify-between bg-surface-0 px-4 py-8 sm:px-6">
-      <div className="mx-auto w-full max-w-md flex-1 flex flex-col justify-center">
+    <div className="relative isolate flex min-h-screen flex-col justify-between px-4 py-8 sm:px-6">
+      <img
+        src={driverLoginImage}
+        alt=""
+        aria-hidden="true"
+        className="absolute inset-0 z-0 h-full w-full object-cover object-[65%_50%]"
+      />
+      <div className="absolute inset-0 z-10 bg-black/55" />
+      <div className="relative z-20 mx-auto w-full max-w-md flex-1 flex flex-col justify-center">
         {/* Header */}
         <div className="text-center mb-6">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-fg text-surface-0 shadow-lg shadow-fg/10 mb-4">
