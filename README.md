@@ -7,7 +7,7 @@ primitives, React Query, Zustand, Socket.IO, GSAP, and Framer Motion.
 
 The application communicates with the LogiFlow API gateway. The gateway and its
 backing services are maintained in the
-[LogiFlow backend repository](https://github.com/Rashmika-Thehan/logiflow-frontend).
+[LogiFlow backend repository](https://github.com/Rashmika-Thehan/logiflow-backend).
 
 ## Features
 
