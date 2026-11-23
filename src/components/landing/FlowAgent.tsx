@@ -84,10 +84,12 @@ export function FlowAgent({ state = 'idle', className }: Props) {
     };
   }, []);
 
+  const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
+
   return (
     <iframe
       ref={iframeRef}
-      src="/flow-agent.html"
+      src={`${baseUrl}/flow-agent.html`}
       title="Flow – LogiFlow AI agent"
       aria-label="Animated LogiFlow AI agent named Flow"
       scrolling="no"

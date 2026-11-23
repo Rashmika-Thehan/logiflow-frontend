@@ -2,7 +2,7 @@ name: Deploy to Cloudflare
 
 on:
   push:
-    branches: [ci-cd]
+    branches: [ci-cd, feat/hero-3d-model]
   workflow_dispatch:
 
 # Only one deploy at a time; a newer push cancels an older in-flight run

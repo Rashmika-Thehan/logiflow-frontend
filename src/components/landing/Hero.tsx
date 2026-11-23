@@ -127,7 +127,7 @@ export function Hero() {
                   'radial-gradient(ellipse at 50% 60%, rgba(96,165,250,0.08) 0%, transparent 72%)',
               }}
             />
-            <div className="relative w-full" style={{ aspectRatio: '3 / 4' }}>
+            <div className="relative w-full min-h-[360px] md:min-h-[420px]" style={{ aspectRatio: '3 / 4' }}>
               <FlowAgent state="idle" className="absolute inset-0 h-full w-full" />
             </div>
           </div>
